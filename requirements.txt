@@ -1,0 +1,5 @@
+git+https://github.com/IDSIA/sacred.git
+matplotlib>=3
+pandas
+jupyterlab
+pymongo
