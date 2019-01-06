@@ -13,8 +13,7 @@ from tensorflow.python.keras.callbacks import Callback
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-env_path = Path('..') / 'infrastructure' / 'sacred_setup' / '.env'
-load_dotenv(dotenv_path=env_path)
+
 
 
 class MetricsLogger(Callback):
@@ -64,9 +63,18 @@ def plot_confusion_matrix(confusion_matrix, class_names, figsize=(15, 12), fonts
 
 
 ex = Experiment('example')
+
+is_travis = 'TRAVIS' in os.environ
+if is_travis:
+    mongo_uri = None
+else:
+    env_path = Path('..') / 'infrastructure' / 'sacred_setup' / '.env'
+    load_dotenv(dotenv_path=env_path)
+    mongo_uri = f'mongodb://{os.environ["MONGO_INITDB_ROOT_USERNAME"]}:{os.environ["MONGO_INITDB_ROOT_PASSWORD"]}@localhost:27017/?authMechanism=SCRAM-SHA-1'
+
 ex.observers.append(MongoObserver.create(
-    url=f'mongodb://{os.environ["MONGO_INITDB_ROOT_USERNAME"]}:{os.environ["MONGO_INITDB_ROOT_PASSWORD"]}@localhost:27017/?authMechanism=SCRAM-SHA-1',
-    db_name=os.environ['MONGO_DATABASE']))
+    url=mongo_uri,
+    db_name='incense_test'))
 
 
 @ex.config
