@@ -21,6 +21,13 @@ class Artifact:
         with open(self._make_filename(), 'wb') as file:
             file.write(self.content)
 
+    def astype(self, content_type):
+        artifact_type = content_type_to_artifact_cls[content_type]
+        return artifact_type(self.name, self.file)
+
+    def as_class(self, artifact_type):
+        return artifact_type(self.name, self.file)
+
     @property
     def content(self):
         if self._content is None:
@@ -65,12 +72,12 @@ class MP4Artifact(Artifact):
 
     def show(self):
         if self.movie is None:
-            self._make_movie()
+            self.movie = self._make_movie()
         return self.movie
 
     def _make_movie(self):
         self.save()
-        self.movie = HTML(f"""
+        return HTML(f"""
         <video width="640" height="480" controls autoplay>
           <source src="{self._make_filename()}" type="video/mp4">
         </video>
@@ -94,3 +101,9 @@ class CSVArtifact(Artifact):
     def _make_df(self):
         df = pd.read_csv(self.file)
         return df
+
+
+content_type_to_artifact_cls = {
+    'image/png': PNGArtifact,
+    'text/csv': CSVArtifact
+}

@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/JarnoRFB/incense.svg?branch=master
+    :target: https://travis-ci.org/JarnoRFB/incense
+
 Incense
 =======
 

@@ -1,9 +1,7 @@
-import itertools
 import os
 from pathlib import Path
 
 import tensorflow as tf
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
@@ -15,8 +13,7 @@ from tensorflow.python.keras.callbacks import Callback
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
-env_path = Path('..') / 'infrastructure' / 'sacred_setup' / '.env'
-load_dotenv(dotenv_path=env_path)
+
 
 
 class MetricsLogger(Callback):
@@ -66,9 +63,18 @@ def plot_confusion_matrix(confusion_matrix, class_names, figsize=(15, 12), fonts
 
 
 ex = Experiment('example')
+
+is_travis = 'TRAVIS' in os.environ
+if is_travis:
+    mongo_uri = None
+else:
+    env_path = Path('..') / 'infrastructure' / 'sacred_setup' / '.env'
+    load_dotenv(dotenv_path=env_path)
+    mongo_uri = f'mongodb://{os.environ["MONGO_INITDB_ROOT_USERNAME"]}:{os.environ["MONGO_INITDB_ROOT_PASSWORD"]}@localhost:27017/?authMechanism=SCRAM-SHA-1'
+
 ex.observers.append(MongoObserver.create(
-    url=f'mongodb://{os.environ["MONGO_INITDB_ROOT_USERNAME"]}:{os.environ["MONGO_INITDB_ROOT_PASSWORD"]}@localhost:27017/?authMechanism=SCRAM-SHA-1',
-    db_name=os.environ['MONGO_DATABASE']))
+    url=mongo_uri,
+    db_name='incense_test'))
 
 
 @ex.config
@@ -113,12 +119,12 @@ def conduct(epochs, optimizer, _run):
     predictions_df = pd.DataFrame({'predictions': predictions,
                                    'targets': y_test})
     predictions_df.to_csv('predictions.csv', index=False)
-    _run.add_artifact('predictions.csv')
+    _run.add_artifact('predictions.csv', name='predictions')
 
     fig = plot_confusion_matrix(confusion_matrix(y_test, predictions),
                                 class_names=list(range(10)))
     fig.savefig('confusion_matrix.png')
-    _run.add_artifact('confusion_matrix.png')
+    _run.add_artifact('confusion_matrix.png', name='confusion_matrix')
 
     scalar_results = model.evaluate(x_test, y_test)
 

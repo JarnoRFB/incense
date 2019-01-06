@@ -2,12 +2,7 @@ import pandas as pd
 from typing import *
 
 from incense import artifact
-from incense.artifact import Artifact
-
-content_type_to_artifact_cls = {
-    'image/png': artifact.PNGArtifact,
-    'text/csv': artifact.CSVArtifact
-}
+from incense.artifact import Artifact, content_type_to_artifact_cls
 
 
 class Experiment:
@@ -32,7 +27,7 @@ class Experiment:
         return cls(id_, database, grid_filesystem, config, artifacts_links)
 
     @property
-    def artifacts(self) -> Dict[str, artifact.Artifact]:
+    def artifacts(self) -> Dict[str, Artifact]:
         """
         The artifacts belonging to the experiment.
 
@@ -63,7 +58,15 @@ class Experiment:
         artifacts = {}
         for artifact_link in self._artifacts_links:
             artifact_file = self._grid_filesystem.get(artifact_link['file_id'])
-            artifact_type = content_type_to_artifact_cls[artifact_file.metadata['content-type']]
+            try:
+                artifact_type = content_type_to_artifact_cls[artifact_file.content_type]
+            except KeyError:
+                # Should be removed once PR is merged.
+                try:
+                    artifact_type = content_type_to_artifact_cls[artifact_file.metadata['content-type']]
+                except KeyError:
+                    artifact_type = Artifact
+
             name = artifact_link['name']
             artifacts[name] = artifact_type(name, artifact_file)
         return artifacts

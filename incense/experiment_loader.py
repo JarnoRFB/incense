@@ -9,10 +9,11 @@ credentials = []
 
 MAX_CACHE_SIZE = 32
 
+
 class ExperimentLoader:
     """Loads artifacts related to experiments."""
 
-    def __init__(self, mongo_uri, db_name):
+    def __init__(self, mongo_uri=None, db_name='sacred'):
         client = MongoClient(mongo_uri)
         self._database = client[db_name]
         self._runs = self._database.runs

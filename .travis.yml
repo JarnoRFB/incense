@@ -1,0 +1,21 @@
+#sudo: required
+
+language: python
+python:
+  - "3.6"
+cache: pip
+
+services:
+  - mongodb
+#  - docker
+
+
+#before_install:
+#  - docker-compose -f infrastructure/test_setup/docker-compose.yml up -d
+
+install:
+  - pip install -r requirements-dev.txt
+
+script:
+  - PYTHONPATH=. python example_experiment/conduct.py
+  - PYTHONPATH=. pytest tests/ -v
