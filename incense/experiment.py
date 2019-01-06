@@ -60,11 +60,11 @@ class Experiment:
             artifact_file = self._grid_filesystem.get(artifact_link['file_id'])
             try:
                 artifact_type = content_type_to_artifact_cls[artifact_file.content_type]
-            except AttributeError:
+            except KeyError:
                 # Should be removed once PR is merged.
                 try:
                     artifact_type = content_type_to_artifact_cls[artifact_file.metadata['content-type']]
-                except (AttributeError, KeyError):
+                except KeyError:
                     artifact_type = Artifact
 
             name = artifact_link['name']
