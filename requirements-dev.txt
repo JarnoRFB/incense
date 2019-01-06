@@ -4,3 +4,4 @@ tensorflow
 python-dotenv
 scikit-learn
 jupyterlab
+seaborn
