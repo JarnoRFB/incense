@@ -113,12 +113,12 @@ def conduct(epochs, optimizer, _run):
     predictions_df = pd.DataFrame({'predictions': predictions,
                                    'targets': y_test})
     predictions_df.to_csv('predictions.csv', index=False)
-    _run.add_artifact('predictions.csv')
+    _run.add_artifact('predictions.csv', name='predictions')
 
     fig = plot_confusion_matrix(confusion_matrix(y_test, predictions),
                                 class_names=list(range(10)))
     fig.savefig('confusion_matrix.png')
-    _run.add_artifact('confusion_matrix.png')
+    _run.add_artifact('confusion_matrix.png', name='confusion_matrix')
 
     scalar_results = model.evaluate(x_test, y_test)
 
