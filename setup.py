@@ -1,5 +1,7 @@
 from setuptools import setup
 import os
+import versioneer
+
 
 _here = os.path.abspath(os.path.dirname(__file__))
 
@@ -8,7 +10,8 @@ with open(os.path.join(_here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='incense',
-    version='0.0.1',
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     description='Interactively retrieve data from sacred experiments.',
     long_description=long_description,
     author='Rüdiger Busche',
