@@ -1,3 +1,4 @@
+import pickle
 from io import BytesIO
 import matplotlib.pyplot as plt
 from IPython.display import HTML
@@ -21,12 +22,17 @@ class Artifact:
         with open(self._make_filename(), 'wb') as file:
             file.write(self.content)
 
-    def astype(self, content_type):
-        artifact_type = content_type_to_artifact_cls[content_type]
-        return artifact_type(self.name, self.file)
+    def as_content_type(self, content_type):
+        """Interpret artifact as being of content-type."""
+        try:
+            artifact_type = content_type_to_artifact_cls[content_type]
+        except KeyError:
+            raise ValueError(f'Incense does not have a class that maps to content-type {content_type}')
+        else:
+            return self.as_type(artifact_type)
 
-    def as_class(self, artifact_type):
-        return artifact_type(self.name, self.file)
+    def as_type(self, artifact_type):
+        return artifact_type(self.name, BytesIO(self.content))
 
     @property
     def content(self):
@@ -101,6 +107,25 @@ class CSVArtifact(Artifact):
     def _make_df(self):
         df = pd.read_csv(self.file)
         return df
+
+
+class PickleArtifact(Artifact):
+    """Displays and saves a CSV artifact"""
+
+    extension = "csv"
+
+    def __init__(self, name, file):
+        super().__init__(name, file)
+        self.pyobject = None
+
+    def show(self):
+        if self.pyobject is None:
+            self.pyobject = self._make()
+        return self.pyobject
+
+    def _make(self):
+        obj = pickle.load(self.file)
+        return obj
 
 
 content_type_to_artifact_cls = {

@@ -61,10 +61,10 @@ class Experiment:
             try:
                 artifact_type = content_type_to_artifact_cls[artifact_file.content_type]
             except KeyError:
-                # Should be removed once PR is merged.
+                # TODO: Should be removed once PR is merged.
                 try:
                     artifact_type = content_type_to_artifact_cls[artifact_file.metadata['content-type']]
-                except KeyError:
+                except (KeyError, TypeError):
                     artifact_type = Artifact
 
             name = artifact_link['name']
