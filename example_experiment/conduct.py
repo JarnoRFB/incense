@@ -14,8 +14,6 @@ from sacred import Experiment
 from sacred.observers import MongoObserver
 
 
-
-
 class MetricsLogger(Callback):
     """Callback to log loss and accuracy to sacred database."""
 
@@ -70,7 +68,8 @@ if is_travis:
 else:
     env_path = Path('..') / 'infrastructure' / 'sacred_setup' / '.env'
     load_dotenv(dotenv_path=env_path)
-    mongo_uri = f'mongodb://{os.environ["MONGO_INITDB_ROOT_USERNAME"]}:{os.environ["MONGO_INITDB_ROOT_PASSWORD"]}@localhost:27017/?authMechanism=SCRAM-SHA-1'
+    mongo_uri = (f'mongodb://{os.environ["MONGO_INITDB_ROOT_USERNAME"]}:'
+                 f'{os.environ["MONGO_INITDB_ROOT_PASSWORD"]}@localhost:27017/?authMechanism=SCRAM-SHA-1')
 
 ex.observers.append(MongoObserver.create(
     url=mongo_uri,
@@ -118,6 +117,9 @@ def conduct(epochs, optimizer, _run):
     predictions = predictions.argmax(axis=1)
     predictions_df = pd.DataFrame({'predictions': predictions,
                                    'targets': y_test})
+    predictions_df.to_pickle('predictions_df.pickle')
+    _run.add_artifact('predictions_df.pickle', name='predictions_df')
+
     predictions_df.to_csv('predictions.csv', index=False)
     _run.add_artifact('predictions.csv', name='predictions')
 
@@ -135,6 +137,7 @@ def conduct(epochs, optimizer, _run):
         _run.log_scalar(f'test_{metric}', value)
 
 
-ex.run('conduct')
-ex.run('conduct', config_updates={'epochs': 5})
-ex.run('conduct', config_updates={'epochs': 5, 'optimizer': 'adam'})
+if __name__ == '__main__':
+    ex.run('conduct')
+    ex.run('conduct', config_updates={'epochs': 5})
+    ex.run('conduct', config_updates={'epochs': 5, 'optimizer': 'adam'})

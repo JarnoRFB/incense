@@ -34,5 +34,5 @@ have to install sacred from github and then install incense from PyPI.
 Documentation
 -------------
 
-`demo.ipynb <demo.ipynb>`__ demonstrates the basic functionality of
+`demo.ipynb <demo.ipynb>`_ demonstrates the basic functionality of
 incense.
