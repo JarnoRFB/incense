@@ -1,21 +1,18 @@
-#sudo: required
-
 language: python
 python:
-  - "3.6"
+- '3.6'
 cache: pip
-
 services:
-  - mongodb
-#  - docker
-
-
-#before_install:
-#  - docker-compose -f infrastructure/test_setup/docker-compose.yml up -d
-
+- mongodb
 install:
-  - pip install -r requirements-dev.txt
-
+- pip install -r requirements-dev.txt
 script:
-  - PYTHONPATH=. python example_experiment/conduct.py
-  - PYTHONPATH=. pytest tests/ -v
+- PYTHONPATH=. python example_experiment/conduct.py
+- PYTHONPATH=. pytest tests/ -v
+deploy:
+  provider: pypi
+  user: jarnoRFB
+  password:
+    secure: hsVPZx685U7iVhN77/2tCpp3MG+dve4/0vFOpzpcih1/qB796ZmDz++fy+z5B+zVd02DkIOV8ZJCXu+u03uINd54VxDWFeRV0ArWXLdIGkxTEM04+rLz6QV7VvUNBUXCJCbwDYMCvX0HkEi/lnPHbzFXU2jRilIkHWO6mS23zJtQNtDCu9gpX4SiszBASKhVYQng3hK0aG1x4M3uCI6eo8/U06oyBe4h8tu5vY4DBZQFA4f5xFIlXPwOP38SIfcAXscK835niak+PQUlyqyMjJXS8UZX9oeIIvkOT58/q/L0P33rPJf9T48GhM7ffmHIBYvmyTWeTX+3pGw7h2KT+Nc1rgZPBGfaJ2oJjYPdeP9wTzh1ChfNVsJRxBjlQ/323b0SzN/Ce1d6o8X2zZN09q4yeADWYZQTb4GwY9apScor3rXl+xbgTo2Cxt8339MylPAyz/A7iE++/xsGhVsOcPp58wp/0Sk9Phy+QasxwXLchjC0gmfYFFhXuZAtw37TNdsl39vhBE0M42XqBBAuaqC6F3SmPkcqdUG/E3h4UnsHOx16wMiSHDYlvSOW74slQldXUIW9WUoriXQrdd6uyROaummWj3T/wOagiubWrRqXNjx9T9RxfXU3SHJzeDUO8mpn+/7S43k9nWxmU/1d+eSzkVF3b4vBPI9koiu5dN4=
+  on:
+    tags: true
