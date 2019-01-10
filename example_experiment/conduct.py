@@ -139,5 +139,5 @@ def conduct(epochs, optimizer, _run):
 
 if __name__ == '__main__':
     ex.run('conduct')
-    ex.run('conduct', config_updates={'epochs': 5})
-    ex.run('conduct', config_updates={'epochs': 5, 'optimizer': 'adam'})
+    ex.run('conduct', config_updates={'epochs': 3})
+    ex.run('conduct', config_updates={'epochs': 3, 'optimizer': 'adam'})
