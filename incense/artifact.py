@@ -18,6 +18,9 @@ class Artifact:
     def __repr__(self):
         return f'{self.__class__.__name__}(name={self.name})'
 
+    def show(self):
+        raise NotImplementedError
+
     def save(self):
         with open(self._make_filename(), 'wb') as file:
             file.write(self.content)
@@ -32,7 +35,8 @@ class Artifact:
             return self.as_type(artifact_type)
 
     def as_type(self, artifact_type):
-        return artifact_type(self.name, BytesIO(self.content))
+        self.file.seek(0)
+        return artifact_type(self.name, self.file)
 
     @property
     def content(self):
@@ -112,7 +116,7 @@ class CSVArtifact(Artifact):
 class PickleArtifact(Artifact):
     """Displays and saves a CSV artifact"""
 
-    extension = "csv"
+    extension = "pickle"
 
     def __init__(self, name, file):
         super().__init__(name, file)
@@ -130,5 +134,6 @@ class PickleArtifact(Artifact):
 
 content_type_to_artifact_cls = {
     'image/png': PNGArtifact,
-    'text/csv': CSVArtifact
+    'text/csv': CSVArtifact,
+    'video/mp4': MP4Artifact
 }

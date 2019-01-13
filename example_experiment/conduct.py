@@ -1,15 +1,15 @@
 import os
 from pathlib import Path
 
+import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 import pandas as pd
 from dotenv import load_dotenv
-
+from matplotlib.animation import FFMpegWriter
 from tensorflow.python.keras.callbacks import Callback
-
 from sacred import Experiment
 from sacred.observers import MongoObserver
 
@@ -60,6 +60,26 @@ def plot_confusion_matrix(confusion_matrix, class_names, figsize=(15, 12), fonts
     return fig
 
 
+def plot_accuracy_development(history, _run):
+    fig, ax = plt.subplots()
+    writer = FFMpegWriter(fps=1)
+    filename = 'accuracy_movie.mp4'
+    with writer.saving(fig, filename, 600):
+        acc = history.history['acc']
+        x = list(range(1, len(acc) + 1))
+        y = acc
+        ax.set(xlim=[0.9, len(acc) + 0.1], ylim=[0, 1],
+               xlabel='epoch', ylabel='accuracy')
+        [acc_line] = ax.plot(x, y, 'o-')
+
+        for i in range(1, len(acc) + 1):
+            acc_line.set_data(x[:i], y[:i])
+
+            writer.grab_frame()
+
+    _run.add_artifact(filename=filename, name='accuracy_movie')
+
+
 ex = Experiment('example')
 
 is_travis = 'TRAVIS' in os.environ
@@ -108,9 +128,9 @@ def conduct(epochs, optimizer, _run):
 
     metrics_logger = MetricsLogger(_run)
 
-    model.fit(x_train, y_train,
-              epochs=epochs,
-              callbacks=[metrics_logger])
+    history = model.fit(x_train, y_train,
+                        epochs=epochs,
+                        callbacks=[metrics_logger])
 
     predictions = model.predict(x_test)
 
@@ -127,6 +147,8 @@ def conduct(epochs, optimizer, _run):
                                 class_names=list(range(10)))
     fig.savefig('confusion_matrix.png')
     _run.add_artifact('confusion_matrix.png', name='confusion_matrix')
+
+    plot_accuracy_development(history, _run)
 
     scalar_results = model.evaluate(x_test, y_test)
 
