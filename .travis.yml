@@ -2,8 +2,10 @@ sudo: required
 language: python
 python:
   - '3.6'
+  - '3.7'
 os:
   - linux
+dist: xenial
 cache: pip
 services:
   - mongodb
