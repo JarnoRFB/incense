@@ -1,11 +1,11 @@
+import numbers
+from typing import *
+
 from pymongo import MongoClient
 import gridfs
 from functools import lru_cache
-from typing import *
 
 from incense.experiment import Experiment
-
-credentials = []
 
 MAX_CACHE_SIZE = 32
 
@@ -67,40 +67,43 @@ class ExperimentLoader:
         return self.find_by_key('experiment.name', name)
 
     @lru_cache(maxsize=MAX_CACHE_SIZE)
-    def find_by_config_key(self, key: str, value: str) -> List[Experiment]:
+    def find_by_config_key(self, key: str, value: Union[str, numbers.Real]) -> List[Experiment]:
         """
-        Find experiments based on regex search against a configuration value.
+        Find experiments based on search against a configuration value.
 
         A partial match between configuration value and regex is enough
         to find the experiment.
 
         Args:
             key: Configuration key to search on.
-            value: Regex that is matched against the experiment's configuration.
+            value: Value that is matched against the experiment's configuration.
+                   Can be either a string which is  then interpreted as a regex or a number.
 
         Returns:
             The matched experiments.
         """
-        cursor = self._runs.find({f'config.{key}': {'$regex': rf'{value}'}})
+        key = f'config.{key}'
+        cursor = self._search_collection(key, value)
         experiments = [self._make_experiment(experiment) for experiment in cursor]
         return experiments
 
     @lru_cache(maxsize=MAX_CACHE_SIZE)
-    def find_by_key(self, key: str, value: str) -> List[Experiment]:
+    def find_by_key(self, key: str, value: Union[str, numbers.Real]) -> List[Experiment]:
         """
-        Find experiments based on regex search against a value stored in the database.
+        Find experiments based on search against a value stored in the database.
 
         A partial match between the value and the regex is enough
         to find the experiment.
 
         Args:
             key: Key to search on.
-            value: Regex that is matched against the experiment's configuration.
+            value: Value that is matched against the experiment's information.
+                   Can be either a string which is  then interpreted as a regex or a number.
 
         Returns:
             The matched experiments.
         """
-        cursor = self._runs.find({key: {'$regex': rf'{value}'}})
+        cursor = self._search_collection(key, value)
         experiments = [self._make_experiment(experiment) for experiment in cursor]
         return experiments
 
@@ -110,3 +113,10 @@ class ExperimentLoader:
 
     def _make_experiment(self, experiment) -> Experiment:
         return Experiment.from_db_object(self._database, self._grid_filesystem, experiment)
+
+    def _search_collection(self, key, value):
+        if isinstance(value, str):
+            cursor = self._runs.find({key: {'$regex': rf'{value}'}})
+        elif isinstance(value, numbers.Real):
+            cursor = self._runs.find({key: value})
+        return cursor

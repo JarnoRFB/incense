@@ -9,7 +9,6 @@ def test_find_by_id(loader):
 
 def test_find_by_name(loader):
     exps = loader.find_by_name('example')
-    print(exps)
     assert len(exps) == 3
 
 
@@ -19,7 +18,13 @@ def test_find_by_key(loader):
     assert exps[0].config['optimizer'] == 'adam'
 
 
-def test_find_by_config_key(loader):
+def test_find_by_str_config_key(loader):
     exps = loader.find_by_config_key('optimizer', 'adam')
     assert len(exps) == 1
     assert exps[0].config['optimizer'] == 'adam'
+
+
+def test_find_by_number_config_key(loader):
+    exps = loader.find_by_config_key('epochs', 3)
+    assert len(exps) == 1
+    assert exps[0].config['epochs'] == 3
