@@ -1,14 +1,23 @@
+sudo: required
 language: python
 python:
-- '3.6'
+  - '3.6'
+os:
+  - linux
+dist: xenial
 cache: pip
 services:
-- mongodb
+  - mongodb
+before_install:
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo add-apt-repository -y ppa:mc3man/xerus-media; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get update; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -y ffmpeg; fi
+  - ffmpeg -hwaccels
 install:
-- pip install -r requirements-dev.txt
+  - pip install -r requirements-dev.txt
 script:
-- PYTHONPATH=. python example_experiment/conduct.py
-- PYTHONPATH=. pytest tests/ -v
+  - PYTHONPATH=. python example_experiment/conduct.py
+  - PYTHONPATH=. pytest tests/ -v
 deploy:
   provider: pypi
   user: jarnoRFB
