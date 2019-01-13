@@ -1,14 +1,17 @@
+sudo: required
 language: python
 python:
-- '3.6'
+  - '3.6'
 cache: pip
 services:
-- mongodb
+  - mongodb
+before_intstall:
+  - sudo apt install ffmpeg
 install:
-- pip install -r requirements-dev.txt
+  - pip install -r requirements-dev.txt
 script:
-- PYTHONPATH=. python example_experiment/conduct.py
-- PYTHONPATH=. pytest tests/ -v
+  - PYTHONPATH=. python example_experiment/conduct.py
+  - PYTHONPATH=. pytest tests/ -v
 deploy:
   provider: pypi
   user: jarnoRFB
