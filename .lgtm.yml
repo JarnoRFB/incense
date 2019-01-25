@@ -1,2 +1,6 @@
 extraction:
-  exclude: ['versioneer.py', 'incense/_version.py']
+  python:
+    index:
+      exclude:
+        - versioneer.py
+        - incense/_version.py
