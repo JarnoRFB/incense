@@ -1,0 +1,3 @@
+extraction:
+  python:
+    exclude: ['versioneer.py', 'incense/_version.py']
