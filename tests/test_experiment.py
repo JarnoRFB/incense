@@ -1,3 +1,4 @@
+from datetime import datetime
 import pandas as pd
 
 
@@ -22,3 +23,27 @@ def test_metrics_len(loader):
 
     exp2 = loader.find_by_id(2)
     assert len(exp2.metrics['training_loss']) == 3
+
+
+def test_dotted_attribute_access(loader):
+    exp = loader.find_by_id(2)
+    assert exp.config.epochs == 3
+    assert exp.experiment.name == 'example'
+    assert exp.experiment.mainfile == 'conduct.py'
+
+    assert isinstance(exp.start_time, datetime)
+    assert isinstance(exp.result, float)
+
+
+def test_item_attribute_access(loader):
+    exp = loader.find_by_id(2)
+    assert exp.config['epochs'] == 3
+    assert exp.experiment['name'] == 'example'
+    assert exp.experiment['mainfile'] == 'conduct.py'
+
+
+def test_to_dict(loader):
+    exp = loader.find_by_id(2)
+    exp_dict = exp.to_dict()
+    assert isinstance(exp_dict, dict)
+    assert exp.keys() == exp_dict.keys()

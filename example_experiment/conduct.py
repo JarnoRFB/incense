@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -12,6 +11,7 @@ from matplotlib.animation import FFMpegWriter
 from tensorflow.python.keras.callbacks import Callback
 from sacred import Experiment
 from sacred.observers import MongoObserver
+from sacred.utils import apply_backspaces_and_linefeeds
 
 
 class MetricsLogger(Callback):
@@ -22,7 +22,6 @@ class MetricsLogger(Callback):
         self._run = run
 
     def on_epoch_end(self, epoch, logs):
-        print("LOGS ARE:", logs)
         self._run.log_scalar("training_loss", float(logs['loss']), step=epoch)
         self._run.log_scalar("training_acc", float(logs['acc']), step=epoch)
 
@@ -81,6 +80,8 @@ def plot_accuracy_development(history, _run):
 
 
 ex = Experiment('example')
+ex.captured_out_filter = apply_backspaces_and_linefeeds
+
 
 is_travis = 'TRAVIS' in os.environ
 if is_travis:
@@ -130,7 +131,8 @@ def conduct(epochs, optimizer, _run):
 
     history = model.fit(x_train, y_train,
                         epochs=epochs,
-                        callbacks=[metrics_logger])
+                        callbacks=[metrics_logger],
+                        verbose=0)
 
     predictions = model.predict(x_test)
 
@@ -150,13 +152,15 @@ def conduct(epochs, optimizer, _run):
 
     plot_accuracy_development(history, _run)
 
-    scalar_results = model.evaluate(x_test, y_test)
+    scalar_results = model.evaluate(x_test, y_test, verbose=0)
 
     results = dict(zip(model.metrics_names, scalar_results))
     print('Final test results')
     print(results)
     for metric, value in results.items():
         _run.log_scalar(f'test_{metric}', value)
+
+    return results['acc']
 
 
 if __name__ == '__main__':

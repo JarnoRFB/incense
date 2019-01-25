@@ -16,9 +16,10 @@ class Experiment:
         self._metrics = None
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(id={self.id})'
+        return f'{self.__class__.__name__}(id={self.id}, name={self.experiment.name})'
 
     def __getattr__(self, item):
+        """Try to relay attribute access to easy dict, to allow dotted access."""
         return getattr(self._data, item)
 
     @classmethod
@@ -55,6 +56,14 @@ class Experiment:
             self._metrics = self._load_metrics()
 
         return self._metrics
+
+    def to_dict(self) -> dict:
+        """Convert the experiment to a dictionary.
+
+        Returns:
+            A dict with all data from the sacred data model.
+        """
+        return dict(zip(self.keys(), self.values()))
 
     def _load_artifacts(self) -> Dict[str, Artifact]:
         artifacts = {}
