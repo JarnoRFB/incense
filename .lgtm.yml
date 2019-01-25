@@ -1,3 +1,2 @@
 extraction:
-  python:
-    exclude: ['versioneer.py', 'incense/_version.py']
+  exclude: ['versioneer.py', 'incense/_version.py']
