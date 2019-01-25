@@ -1,15 +1,14 @@
 import pandas as pd
 from typing import *
-
-from incense import artifact
+from easydict import EasyDict
 from incense.artifact import Artifact, content_type_to_artifact_cls
 
 
 class Experiment:
 
-    def __init__(self, id_, database, grid_filesystem, config, artifact_links):
+    def __init__(self, id_, database, grid_filesystem, data, artifact_links):
         self.id = id_
-        self.config = config
+        self._data = data
         self._artifacts_links = artifact_links
         self._database = database
         self._grid_filesystem = grid_filesystem
@@ -17,14 +16,18 @@ class Experiment:
         self._metrics = None
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(id={self.id})'
+        return f'{self.__class__.__name__}(id={self.id}, name={self.experiment.name})'
+
+    def __getattr__(self, item):
+        """Try to relay attribute access to easy dict, to allow dotted access."""
+        return getattr(self._data, item)
 
     @classmethod
     def from_db_object(cls, database, grid_filesystem, experiment_data: dict):
-        config = experiment_data['config']
+        data = EasyDict(experiment_data)
         artifacts_links = experiment_data['artifacts']
         id_ = experiment_data['_id']
-        return cls(id_, database, grid_filesystem, config, artifacts_links)
+        return cls(id_, database, grid_filesystem, data, artifacts_links)
 
     @property
     def artifacts(self) -> Dict[str, Artifact]:
@@ -53,6 +56,14 @@ class Experiment:
             self._metrics = self._load_metrics()
 
         return self._metrics
+
+    def to_dict(self) -> dict:
+        """Convert the experiment to a dictionary.
+
+        Returns:
+            A dict with all data from the sacred data model.
+        """
+        return dict(zip(self.keys(), self.values()))
 
     def _load_artifacts(self) -> Dict[str, Artifact]:
         artifacts = {}

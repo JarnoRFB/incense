@@ -24,7 +24,8 @@ setup(
         'matplotlib>=3',
         'pandas>=0.23',
         'jupyterlab>=0.35',
-        'pymongo>=3.7'
+        'pymongo>=3.7',
+        'easydict>=1.9'
     ],
     include_package_data=True,
     classifiers=[
