@@ -99,8 +99,8 @@ ex.observers.append(MongoObserver.create(
 
 @ex.config
 def hyperparameters():
-    optimizer = 'sgd'
-    epochs = 1
+    optimizer = 'sgd'  # lgtm [py/unused-local-variable]
+    epochs = 1  # lgtm [py/unused-local-variable]
 
 
 def make_model():
