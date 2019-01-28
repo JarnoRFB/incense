@@ -17,7 +17,8 @@ install:
   - pip install -r requirements-dev.txt
 script:
   - PYTHONPATH=. python example_experiment/conduct.py
-  - PYTHONPATH=. pytest tests/ -v
+  - PYTHONPATH=. pytest --cov=incense tests/ -v
+  - codecov || echo "codecov upload failed"
 deploy:
   provider: pypi
   user: jarnoRFB

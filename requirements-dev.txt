@@ -1,5 +1,6 @@
 -r requirements.txt
 pytest
+pytest-cov
 tensorflow
 python-dotenv
 scikit-learn

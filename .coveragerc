@@ -1,0 +1,4 @@
+[run]
+source = incense
+omit =
+    incense/_version.py
