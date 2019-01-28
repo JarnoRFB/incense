@@ -2,6 +2,11 @@ from datetime import datetime
 import pandas as pd
 
 
+def test_repr(loader):
+    exp = loader.find_by_id(3)
+    assert repr(exp) == 'Experiment(id=3, name=example)'
+
+
 def test_metrics(loader):
     exp = loader.find_by_id(3)
     metric_names = [

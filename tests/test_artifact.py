@@ -2,11 +2,20 @@ import os
 import imghdr
 import pickle
 
+from pytest import raises
 import pandas as pd
 import matplotlib
 from IPython.display import HTML
 
 from incense import artifact
+
+
+def test_repr(loader):
+    exp = loader.find_by_id(3)
+    csv_artifact = exp.artifacts['predictions']
+    assert repr(csv_artifact) == 'CSVArtifact(name=predictions)'
+    mp4_artifact = exp.artifacts['accuracy_movie']
+    assert repr(mp4_artifact) == 'MP4Artifact(name=accuracy_movie)'
 
 
 def test_png_artifact_show(loader):
@@ -83,3 +92,23 @@ def test_as_type(loader):
     pickle_artifact1 = exp.artifacts['predictions_df'].as_type(artifact.PickleArtifact)
     pickle_artifact2 = exp.artifacts['predictions_df'].as_type(artifact.PickleArtifact)
     assert isinstance(pickle_artifact2.show(), pd.DataFrame)
+
+
+def test_as_content_type(loader):
+    exp = loader.find_by_id(2)
+    assert isinstance(exp.artifacts['history'], artifact.Artifact)
+    text_artifact_as_csv = exp.artifacts['history'].as_content_type('text/csv')
+    assert isinstance(text_artifact_as_csv.show(), pd.DataFrame)
+
+
+def test_as_content_type_with_unkwown_content_type(loader):
+    exp = loader.find_by_id(2)
+    assert isinstance(exp.artifacts['history'], artifact.Artifact)
+    with raises(ValueError):
+        text_artifact_as_something_strange = exp.artifacts['history'].as_content_type('something/strange')
+
+
+def test_artifact_show(loader):
+    exp = loader.find_by_id(3)
+    with raises(NotImplementedError):
+        exp.artifacts['predictions_df'].show()

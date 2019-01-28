@@ -7,6 +7,13 @@ def test_find_by_id(loader):
     assert exp.id == 1
 
 
+def test_find_by_ids(loader):
+    exps = loader.find_by_ids([1, 2])
+    for exp in exps:
+        assert isinstance(exp, Experiment)
+    assert len(exps) == 2
+
+
 def test_find_by_name(loader):
     exps = loader.find_by_name('example')
     assert len(exps) == 3

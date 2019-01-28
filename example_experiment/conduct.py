@@ -79,6 +79,16 @@ def plot_accuracy_development(history, _run):
     _run.add_artifact(filename=filename, name='accuracy_movie')
 
 
+def write_csv_as_text(history, _run):
+    filename = 'history.txt'
+    with open(filename, 'w') as handle:
+        handle.write('acc, loss\n')
+        for acc, loss in zip(history.history['acc'], history.history['loss']):
+            handle.write(f'{acc}, {loss}\n')
+
+    _run.add_artifact(filename=filename, name='history')
+
+
 ex = Experiment('example')
 ex.captured_out_filter = apply_backspaces_and_linefeeds
 
@@ -101,6 +111,7 @@ ex.observers.append(MongoObserver.create(
 def hyperparameters():
     optimizer = 'sgd'  # lgtm [py/unused-local-variable]
     epochs = 1  # lgtm [py/unused-local-variable]
+    seed = 0
 
 
 def make_model():
@@ -151,7 +162,7 @@ def conduct(epochs, optimizer, _run):
     _run.add_artifact('confusion_matrix.png', name='confusion_matrix')
 
     plot_accuracy_development(history, _run)
-
+    write_csv_as_text(history, _run)
     scalar_results = model.evaluate(x_test, y_test, verbose=0)
 
     results = dict(zip(model.metrics_names, scalar_results))

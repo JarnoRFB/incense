@@ -4,8 +4,8 @@ from incense.experiment import Experiment
 from typing import *
 
 
-def find_differing_config_keys(experiments: Iterable[Experiment]):
-    """Find the config keys that were assigned to different values in a cohort of experiments.."""
+def find_differing_config_keys(experiments: Iterable[Experiment]) -> set:
+    """Find the config keys that were assigned to different values in a cohort of experiments."""
     config_values = []
     configs = []
     for experiment in experiments:
@@ -22,5 +22,5 @@ def find_differing_config_keys(experiments: Iterable[Experiment]):
     return differing_config_keys
 
 
-def format_config(config, *config_keys):
-    return ' | '.join(f'{key}={config[key]}' for key in config_keys)
+def format_config(exp: Experiment, *config_keys) -> str:
+    return ' | '.join(f'{key}={exp.config[key]}' for key in config_keys)
