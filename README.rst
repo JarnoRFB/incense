@@ -1,6 +1,9 @@
 .. image:: https://travis-ci.org/JarnoRFB/incense.svg?branch=master
     :target: https://travis-ci.org/JarnoRFB/incense
 
+.. image:: https://codecov.io/gh/JarnoRFB/incense/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/JarnoRFB/incense
+
 .. image:: https://img.shields.io/lgtm/grade/python/g/JarnoRFB/incense.svg?logo=lgtm&logoWidth=18
     :target: https://lgtm.com/projects/g/JarnoRFB/incense/context:python
 
