@@ -65,6 +65,12 @@ class Experiment:
         """
         return dict(zip(self.keys(), self.values()))
 
+    def delete(self):
+        """Delete run together with its artifacts and metrics."""
+        self._delete_artifacts()
+        self._delete_metrics()
+        self._database.runs.delete_one({'_id': self.id})
+
     def _load_artifacts(self) -> Dict[str, Artifact]:
         artifacts = {}
         for artifact_link in self._artifacts_links:
@@ -90,3 +96,10 @@ class Experiment:
                                                          index=pd.Index(metric_db_entry['steps'], name='step'),
                                                          name=metric_db_entry['name'])
         return metrics
+
+    def _delete_metrics(self):
+        self._database.metrics.delete_many({'run_id': self.id})
+
+    def _delete_artifacts(self):
+        for artifact_link in self._artifacts_links:
+            self._grid_filesystem.delete(artifact_link['file_id'])
