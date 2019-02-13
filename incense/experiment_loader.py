@@ -67,7 +67,7 @@ class ExperimentLoader:
         return self.find_by_key('experiment.name', name)
 
     @lru_cache(maxsize=MAX_CACHE_SIZE)
-    def find_by_config_key(self, key: str, value: Union[str, numbers.Real]) -> List[Experiment]:
+    def find_by_config_key(self, key: str, value: Union[str, numbers.Real, tuple]) -> List[Experiment]:
         """
         Find experiments based on search against a configuration value.
 
@@ -107,6 +107,19 @@ class ExperimentLoader:
         experiments = [self._make_experiment(experiment) for experiment in cursor]
         return experiments
 
+    def find(self, query: dict) -> List[Experiment]:
+        """Find experiments based on a mongo query.
+
+        Args:
+            An arbitrary mongo query.
+
+        Returns:
+            The matched experiments.
+        """
+        cursor = self._runs.find(query)
+        experiments = [self._make_experiment(experiment) for experiment in cursor]
+        return experiments
+
     @lru_cache(maxsize=MAX_CACHE_SIZE)
     def _find_experiment(self, experiment_id: int):
         return self._runs.find_one({'_id': experiment_id})
@@ -119,4 +132,6 @@ class ExperimentLoader:
             cursor = self._runs.find({key: {'$regex': rf'{value}'}})
         elif isinstance(value, numbers.Real):
             cursor = self._runs.find({key: value})
+        elif isinstance(value, tuple):
+            cursor = self._runs.find({key: {"$all": value}})
         return cursor
