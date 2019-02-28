@@ -1,4 +1,4 @@
+conda activate incense
 mkdir data
 mongod --bind_ip 127.0.0.1 --dbpath data &
-conda activate incense
 python conduct.py
