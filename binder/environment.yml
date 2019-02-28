@@ -9,6 +9,6 @@ dependencies:
   - pandas
   - scikit-learn
   - mongodb
-pip:
-  - tensorflow
-  - python-dotenv
+  - pip:
+    - tensorflow
+    - python-dotenv
