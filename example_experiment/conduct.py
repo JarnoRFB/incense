@@ -1,12 +1,8 @@
-import os
-from pathlib import Path
-
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
 import pandas as pd
-from dotenv import load_dotenv
 from matplotlib.animation import FFMpegWriter
 from tensorflow.python.keras.callbacks import Callback
 from sacred import Experiment
@@ -92,19 +88,13 @@ def write_csv_as_text(history, _run):
 ex = Experiment('example')
 ex.captured_out_filter = apply_backspaces_and_linefeeds
 
+ex.observers.append(
+    MongoObserver.create(
+        url=None,
+        db_name='incense_test',
+    )
+)
 
-is_travis = 'TRAVIS' in os.environ
-if is_travis:
-    mongo_uri = None
-else:
-    env_path = Path('..') / 'infrastructure' / 'sacred_setup' / '.env'
-    load_dotenv(dotenv_path=env_path)
-    mongo_uri = (f'mongodb://{os.environ["MONGO_INITDB_ROOT_USERNAME"]}:'
-                 f'{os.environ["MONGO_INITDB_ROOT_PASSWORD"]}@localhost:27017/?authMechanism=SCRAM-SHA-1')
-
-ex.observers.append(MongoObserver.create(
-    url=mongo_uri,
-    db_name='incense_test'))
 
 
 @ex.config
