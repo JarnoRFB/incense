@@ -9,6 +9,8 @@ dependencies:
   - pandas
   - scikit-learn
   - mongodb
+  - seaborn
   - pip:
+    - incense
     - tensorflow
     - python-dotenv
