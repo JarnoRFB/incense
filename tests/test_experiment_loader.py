@@ -1,3 +1,4 @@
+from pytest import raises
 from incense.experiment import Experiment
 
 
@@ -35,3 +36,19 @@ def test_find_by_number_config_key(loader):
     exps = loader.find_by_config_key('epochs', 3)
     assert len(exps) == 1
     assert exps[0].config['epochs'] == 3
+
+
+def test_find(loader):
+    exps = loader.find(
+        {"$and": [
+            {"config.optimizer": "sgd"},
+            {"config.epochs": 3},
+        ]}
+    )
+    assert len(exps) == 1
+    assert exps[0].id == 2
+
+
+def test_error_message_for_missing_id(loader):
+    with raises(ValueError, match='Experiment with id 4 does not exist in database "incense_test".'):
+        exp = loader.find_by_id(4)

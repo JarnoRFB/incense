@@ -65,11 +65,18 @@ class Experiment:
         """
         return dict(zip(self.keys(), self.values()))
 
-    def delete(self):
-        """Delete run together with its artifacts and metrics."""
-        self._delete_artifacts()
-        self._delete_metrics()
-        self._database.runs.delete_one({'_id': self.id})
+    def delete(self, confirmed: bool = False):
+        """Delete run together with its artifacts and metrics.
+
+        Args:
+            confirmed: Whether to skip the confirmation prompt.
+        """
+        if not confirmed:
+            confirmed = input(f"Are you sure you want to delete {self}? [y/N]") == "y"
+        if confirmed:
+            self._delete_artifacts()
+            self._delete_metrics()
+            self._database.runs.delete_one({'_id': self.id})
 
     def _load_artifacts(self) -> Dict[str, Artifact]:
         artifacts = {}

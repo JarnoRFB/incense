@@ -1,5 +1,7 @@
 from datetime import datetime
 import pandas as pd
+from pytest import raises
+from sacred import Experiment
 
 
 def test_repr(loader):
@@ -52,3 +54,36 @@ def test_to_dict(loader):
     exp_dict = exp.to_dict()
     assert isinstance(exp_dict, dict)
     assert exp.keys() == exp_dict.keys()
+
+
+def test_delete(delete_db_loader, mongo_observer):
+    # Add experiment to db.
+    ex = Experiment("to be deleted")
+    ex.observers.append(mongo_observer)
+    ex.add_config({"value": 1})
+
+    def run(value, _run):
+        _run.log_scalar("test_metric", 1)
+        _run.add_artifact(__file__)
+        return value
+
+    ex.main(run)
+    ex.run()
+    # Retrieve and delete experiment.
+    exp = delete_db_loader.find_by_id(1)
+    exp.delete(confirmed=True)
+    delete_db_loader.find_by_id.cache_clear()
+    # Make sure experiment cannot be retrieved again.
+    with raises(ValueError):
+        exp = delete_db_loader.find_by_id(1)
+
+
+def test_delete_prompt(loader, monkeypatch):
+    """Check that experiment is not deleted if prompt is answered with 'N'."""
+    exp = loader.find_by_id(1)
+    with monkeypatch.context() as m:
+        m.setattr('builtins.input', lambda x: "N")
+        exp.delete()
+    loader.find_by_id.cache_clear()
+    exp = loader.find_by_id(1)
+    assert exp.id == 1

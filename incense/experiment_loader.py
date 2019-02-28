@@ -120,9 +120,11 @@ class ExperimentLoader:
         experiments = [self._make_experiment(experiment) for experiment in cursor]
         return experiments
 
-    @lru_cache(maxsize=MAX_CACHE_SIZE)
     def _find_experiment(self, experiment_id: int):
-        return self._runs.find_one({'_id': experiment_id})
+        run = self._runs.find_one({'_id': experiment_id})
+        if run is None:
+            raise ValueError(f'Experiment with id {experiment_id} does not exist in database "{self._database.name}".')
+        return run
 
     def _make_experiment(self, experiment) -> Experiment:
         return Experiment.from_db_object(self._database, self._grid_filesystem, experiment)
@@ -132,6 +134,4 @@ class ExperimentLoader:
             cursor = self._runs.find({key: {'$regex': rf'{value}'}})
         elif isinstance(value, numbers.Real):
             cursor = self._runs.find({key: value})
-        elif isinstance(value, tuple):
-            cursor = self._runs.find({key: {"$all": value}})
         return cursor
