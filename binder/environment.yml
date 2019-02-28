@@ -1,0 +1,14 @@
+name: incense
+channels:
+  - conda-forge
+  - anaconda
+dependencies:
+  - python=3.6
+  - numpy
+  - matplotlib
+  - pandas
+  - scikit-learn
+  - mongodb
+pip:
+  - tensorflow
+  - python-dotenv
