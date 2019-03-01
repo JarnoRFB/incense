@@ -1,5 +1,5 @@
 .. image:: https://mybinder.org/badge_logo.svg
- :target: https://mybinder.org/v2/gh/JarnoRFB/incense?urlpath=lab/tree/demo.ipynb
+ :target: https://mybinder.org/v2/gh/JarnoRFB/incense/master?urlpath=lab/tree/demo.ipynb
 
 .. image:: https://travis-ci.org/JarnoRFB/incense.svg?branch=master
     :target: https://travis-ci.org/JarnoRFB/incense
@@ -45,4 +45,4 @@ Documentation
 
 `demo.ipynb <demo.ipynb>`_ demonstrates the basic functionality of
 incense. You can also try it out interactively on
-`binder <https://mybinder.org/v2/gh/JarnoRFB/incense?urlpath=lab/tree/demo.ipynb>`_.
+`binder <https://mybinder.org/v2/gh/JarnoRFB/incense/master?urlpath=lab/tree/demo.ipynb>`_.
