@@ -7,10 +7,10 @@ dependencies:
   - numpy
   - matplotlib
   - pandas
+  - tensorflow
   - scikit-learn
   - mongodb
   - seaborn
   - pip:
+    - git+https://github.com/IDSIA/sacred.git
     - incense
-    - tensorflow
-    - python-dotenv
