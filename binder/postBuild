@@ -2,3 +2,4 @@
 mkdir data
 mongod --bind_ip 127.0.0.1 --dbpath data &
 python example_experiment/conduct.py
+jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace demo.ipynb
