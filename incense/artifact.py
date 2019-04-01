@@ -1,8 +1,10 @@
 import pickle
+import os
 from io import BytesIO
 import matplotlib.pyplot as plt
-from IPython.display import HTML
+from IPython.display import HTML, IFrame
 import pandas as pd
+import warnings
 
 
 class Artifact:
@@ -18,11 +20,16 @@ class Artifact:
     def __repr__(self):
         return f'{self.__class__.__name__}(name={self.name})'
 
-    def show(self):
+    def render(self):
         raise NotImplementedError
 
-    def save(self):
-        with open(self._make_filename(), 'wb') as file:
+    def show(self):
+        warnings.warn("`show` is deprecated in favor of `render` and will removed in a future release.", DeprecationWarning,
+                      stacklevel=2)
+        return self.render()
+
+    def save(self, save_dir=''):
+        with open(os.path.join(save_dir, self._make_filename()), 'wb') as file:
             file.write(self.content)
 
     def as_content_type(self, content_type):
@@ -58,7 +65,7 @@ class PNGArtifact(Artifact):
         super().__init__(name, file)
         self._img = None
 
-    def show(self, figsize=(10, 10)):
+    def render(self, figsize=(10, 10)):
         fig, ax = plt.subplots(figsize=figsize)
         ax.imshow(self.img)
         ax.axis('off')
@@ -80,7 +87,7 @@ class MP4Artifact(Artifact):
         super().__init__(name, file)
         self.movie = None
 
-    def show(self):
+    def render(self):
         if self.movie is None:
             self.movie = self._make_movie()
         return self.movie
@@ -103,7 +110,7 @@ class CSVArtifact(Artifact):
         super().__init__(name, file)
         self.df = None
 
-    def show(self):
+    def render(self):
         if self.df is None:
             self.df = self._make_df()
         return self.df
@@ -114,7 +121,7 @@ class CSVArtifact(Artifact):
 
 
 class PickleArtifact(Artifact):
-    """Displays and saves a CSV artifact"""
+    """Displays and saves a Pickle artifact"""
 
     extension = "pickle"
 
@@ -122,7 +129,7 @@ class PickleArtifact(Artifact):
         super().__init__(name, file)
         self.pyobject = None
 
-    def show(self):
+    def render(self):
         if self.pyobject is None:
             self.pyobject = self._make()
         return self.pyobject
@@ -132,8 +139,28 @@ class PickleArtifact(Artifact):
         return obj
 
 
+class PDFArtifact(Artifact):
+    """Displays and saves a PDF artifacts."""
+    extension = "pdf"
+
+    # def __init__(self, name, file):
+    #     print(super())
+    #     super().__init__(name, file)
+    #     self.pdf = None
+    #
+    # def render(self):
+    #     if self.pdf is None:
+    #         self.pdf = self._make_pdf()
+    #     return self.pdf
+    #
+    # def _make_pdf(self):
+    #     self.save()
+    #     return IFrame(self._make_filename(), width=600, height=300)
+
+
 content_type_to_artifact_cls = {
     'image/png': PNGArtifact,
     'text/csv': CSVArtifact,
-    'video/mp4': MP4Artifact
+    'video/mp4': MP4Artifact,
+    'application/pdf': PDFArtifact
 }
