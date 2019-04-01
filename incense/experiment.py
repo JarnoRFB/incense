@@ -82,17 +82,16 @@ class Experiment:
         artifacts = {}
         for artifact_link in self._artifacts_links:
             artifact_file = self._grid_filesystem.get(artifact_link['file_id'])
-            try:
-                artifact_type = content_type_to_artifact_cls[artifact_file.content_type]
-            except KeyError:
-                # TODO: Should be removed once PR is merged.
-                try:
-                    artifact_type = content_type_to_artifact_cls[artifact_file.metadata['content-type']]
-                except (KeyError, TypeError):
-                    artifact_type = Artifact
-
             name = artifact_link['name']
-            artifacts[name] = artifact_type(name, artifact_file)
+
+            try:
+                content_type = artifact_file.content_type
+                artifact_type = content_type_to_artifact_cls[content_type]
+                artifacts[name] = artifact_type(name, artifact_file, content_type=content_type)
+            except KeyError:
+                artifact_type = Artifact
+                artifacts[name] = artifact_type(name, artifact_file)
+
         return artifacts
 
     def _load_metrics(self) -> Dict[str, pd.Series]:

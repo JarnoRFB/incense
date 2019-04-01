@@ -1,34 +1,46 @@
 import pickle
 import os
-from io import BytesIO
-import matplotlib.pyplot as plt
 from IPython.display import HTML
+from IPython import display
 import pandas as pd
 import warnings
+from copy import copy
 
 
 class Artifact:
     """Displays or saves an artifact."""
 
-    extension = ""
+    can_render = tuple()
 
-    def __init__(self, name, file):
+    def __init__(self, name: str, file, content_type: str = None):
         self.name = name
         self.file = file
+        self.content_type = content_type
+        self.extension = None if self.content_type is None else self.content_type.split("/")[-1]
         self._content = None
+        self._rendered = None
 
     def __repr__(self):
         return f'{self.__class__.__name__}(name={self.name})'
 
     def render(self):
+        """Render the artifact according to its content-type."""
+        if self._rendered is None:
+            self._rendered = self._render()
+        return self._rendered
+
+    def _render(self):
+        """Return the object that represents the rendered artifact."""
         raise NotImplementedError
 
     def show(self):
-        warnings.warn("`show` is deprecated in favor of `render` and will removed in a future release.", DeprecationWarning,
+        warnings.warn("`show` is deprecated in favor of `render` and will removed in a future release.",
+                      DeprecationWarning,
                       stacklevel=2)
         return self.render()
 
-    def save(self, save_dir=''):
+    def save(self, save_dir: str = ''):
+        """Save artifact to disk."""
         with open(os.path.join(save_dir, self._make_filename()), 'wb') as file:
             file.write(self.content)
 
@@ -47,6 +59,7 @@ class Artifact:
 
     @property
     def content(self):
+        """Access the raw bytes of the artifact."""
         if self._content is None:
             self._content = self.file.read()
         return self._content
@@ -56,43 +69,21 @@ class Artifact:
         return f'{parts[-2]}_{parts[-1]}.{self.extension}'
 
 
-class PNGArtifact(Artifact):
-    """Displays or saves a PNG artifact."""
+class ImageArtifact(Artifact):
+    """Displays or saves an image artifact."""
 
-    extension = "png"
+    can_render = ('image/png', 'image/jpeg')
 
-    def __init__(self, name, file):
-        super().__init__(name, file)
-        self._img = None
-
-    def render(self, figsize=(10, 10)):
-        fig, ax = plt.subplots(figsize=figsize)
-        ax.imshow(self.img)
-        ax.axis('off')
-        return fig
-
-    @property
-    def img(self):
-        if self._img is None:
-            self._img = plt.imread(BytesIO(self.content))
-        return self._img
+    def _render(self):
+        return display.Image(data=self.content)
 
 
 class MP4Artifact(Artifact):
     """Displays or saves a MP4 artifact"""
 
-    extension = "mp4"
+    can_render = ("video/mp4",)
 
-    def __init__(self, name, file):
-        super().__init__(name, file)
-        self.movie = None
-
-    def render(self):
-        if self.movie is None:
-            self.movie = self._make_movie()
-        return self.movie
-
-    def _make_movie(self):
+    def _render(self):
         self.save()
         return HTML(f"""
         <video width="640" height="480" controls autoplay>
@@ -104,63 +95,40 @@ class MP4Artifact(Artifact):
 class CSVArtifact(Artifact):
     """Displays and saves a CSV artifact"""
 
-    extension = "csv"
+    can_render = ("text/csv",)
 
-    def __init__(self, name, file):
-        super().__init__(name, file)
-        self.df = None
-
-    def render(self):
-        if self.df is None:
-            self.df = self._make_df()
-        return self.df
-
-    def _make_df(self):
-        df = pd.read_csv(self.file)
-        return df
+    def _render(self):
+        return pd.read_csv(self.file)
 
 
 class PickleArtifact(Artifact):
     """Displays and saves a Pickle artifact"""
 
-    extension = "pickle"
+    can_render = tuple()
 
-    def __init__(self, name, file):
-        super().__init__(name, file)
-        self.pyobject = None
+    def __init__(self, name: str, file, content_type: str = None):
+        super().__init__(name, file, content_type)
+        self.extension = "pickle"
 
-    def render(self):
-        if self.pyobject is None:
-            self.pyobject = self._make()
-        return self.pyobject
-
-    def _make(self):
-        obj = pickle.load(self.file)
-        return obj
+    def _render(self):
+        return pickle.load(self.file)
 
 
 class PDFArtifact(Artifact):
     """Displays and saves a PDF artifacts."""
-    extension = "pdf"
+    can_render = ("application/pdf",)
 
-    # def __init__(self, name, file):
-    #     print(super())
-    #     super().__init__(name, file)
-    #     self.pdf = None
-    #
-    # def render(self):
-    #     if self.pdf is None:
-    #         self.pdf = self._make_pdf()
-    #     return self.pdf
-    #
-    # def _make_pdf(self):
-    #     self.save()
+    # TODO probably needs jupyter extension to be able to display pdf.
+    # def _render(self):
     #     return IFrame(self._make_filename(), width=600, height=300)
+    #
 
 
-content_type_to_artifact_cls = {
-    'image/png': PNGArtifact,
-    'text/csv': CSVArtifact,
-    'video/mp4': MP4Artifact,
-    'application/pdf': PDFArtifact
-}
+content_type_to_artifact_cls = {}
+for cls in copy(locals()).values():
+    # print(cls)
+    if isinstance(cls, type) and issubclass(cls, Artifact):
+        for content_type in cls.can_render:
+            content_type_to_artifact_cls[content_type] = cls
+
+# print(content_type_to_artifact_cls)
