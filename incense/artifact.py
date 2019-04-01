@@ -2,7 +2,7 @@ import pickle
 import os
 from io import BytesIO
 import matplotlib.pyplot as plt
-from IPython.display import HTML, IFrame
+from IPython.display import HTML
 import pandas as pd
 import warnings
 
