@@ -7,7 +7,7 @@ from pytest import raises
 import pandas as pd
 import matplotlib
 from IPython.display import HTML
-
+import IPython
 from incense import artifact
 
 
@@ -22,8 +22,8 @@ def test_repr(loader):
 def test_png_artifact_render(loader):
     exp = loader.find_by_id(3)
     png_artifact = exp.artifacts['confusion_matrix']
-    assert isinstance(png_artifact, artifact.PNGArtifact)
-    assert isinstance(png_artifact.render(), matplotlib.figure.Figure)
+    assert isinstance(png_artifact, artifact.ImageArtifact)
+    assert isinstance(png_artifact.render(), IPython.core.display.Image)
 
 
 def test_png_artifact_save(loader):
