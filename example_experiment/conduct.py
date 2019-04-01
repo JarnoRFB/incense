@@ -140,16 +140,23 @@ def conduct(epochs, optimizer, _run):
     predictions = predictions.argmax(axis=1)
     predictions_df = pd.DataFrame({'predictions': predictions,
                                    'targets': y_test})
-    predictions_df.to_pickle('predictions_df.pickle')
-    _run.add_artifact('predictions_df.pickle', name='predictions_df')
+    filename = 'predictions_df.pickle'
+    predictions_df.to_pickle(filename)
+    _run.add_artifact(filename, name='predictions_df')
 
-    predictions_df.to_csv('predictions.csv', index=False)
-    _run.add_artifact('predictions.csv', name='predictions')
+    filename = 'predictions.csv'
+    predictions_df.to_csv(filename, index=False)
+    _run.add_artifact(filename, name='predictions')
 
     fig = plot_confusion_matrix(confusion_matrix(y_test, predictions),
                                 class_names=list(range(10)))
-    fig.savefig('confusion_matrix.png')
-    _run.add_artifact('confusion_matrix.png', name='confusion_matrix')
+    filename = 'confusion_matrix.png'
+    fig.savefig(filename)
+    _run.add_artifact(filename, name='confusion_matrix')
+
+    filename = 'confusion_matrix.pdf'
+    fig.savefig(filename)
+    _run.add_artifact(filename, name='confusion_matrix_pdf')
 
     plot_accuracy_development(history, _run)
     write_csv_as_text(history, _run)
