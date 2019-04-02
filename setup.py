@@ -2,7 +2,6 @@ from setuptools import setup
 import os
 import versioneer
 
-
 _here = os.path.abspath(os.path.dirname(__file__))
 
 with open(os.path.join(_here, 'README.rst'), encoding='utf-8') as f:
@@ -19,6 +18,7 @@ setup(
     url='https://github.com/JarnoRFB/incense',
     license='MIT',
     packages=['incense'],
+    python_requires='>=3.5',
     install_requires=[
         'sacred',
         'matplotlib>=3',
@@ -31,6 +31,7 @@ setup(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7'
     ],
