@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import seaborn as sns
