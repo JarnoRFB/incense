@@ -58,7 +58,7 @@ class QuerySet(UserList):
         return rename_mapping
 
     def _stratify_mapping(self, on):
-        stratified_on = {}
+        stratified_on = OrderedDict()
         for path in on:
             if isinstance(path, dict):
                 stratified_on.update(path)
