@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 from datetime import datetime
 import pandas as pd
 from pytest import raises

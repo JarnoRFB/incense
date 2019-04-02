@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 import pickle
 import os
 from IPython.display import HTML

@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 from pytest import raises
 from incense.experiment import Experiment
 
