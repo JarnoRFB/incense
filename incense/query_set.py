@@ -1,7 +1,7 @@
 # -*- coding: future_fstrings -*-
 from typing import *
 from functools import reduce
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from collections import UserList
 import pandas as pd
 
@@ -57,7 +57,7 @@ class QuerySet(UserList):
         return rename_mapping
 
     def _stratify_mapping(self, on):
-        stratified_on = {}
+        stratified_on = OrderedDict()
         for path in on:
             if isinstance(path, dict):
                 stratified_on.update(path)
