@@ -1,11 +1,11 @@
 import numbers
 from typing import *
-
 from pymongo import MongoClient
 import gridfs
 from functools import lru_cache
 
-from incense.experiment import Experiment
+from .experiment import Experiment
+from .query_set import QuerySet
 
 MAX_CACHE_SIZE = 32
 
@@ -19,7 +19,7 @@ class ExperimentLoader:
         self._runs = self._database.runs
         self._grid_filesystem = gridfs.GridFS(self._database)
 
-    def find_by_ids(self, experiment_ids: Iterable[int]) -> List[Experiment]:
+    def find_by_ids(self, experiment_ids: Iterable[int]) -> QuerySet:
         """
         Find experiments based on a collection of ids.
 
@@ -31,7 +31,7 @@ class ExperimentLoader:
         """
         experiments = [self.find_by_id(experiment_id) for experiment_id in experiment_ids]
 
-        return experiments
+        return QuerySet(experiments)
 
     # The cache makes sure that retrieval of the experiments
     # is not unnecessarily done more than once.
@@ -51,7 +51,7 @@ class ExperimentLoader:
         return self._make_experiment(experiment)
 
     @lru_cache(maxsize=MAX_CACHE_SIZE)
-    def find_by_name(self, name: str) -> List[Experiment]:
+    def find_by_name(self, name: str) -> QuerySet:
         """
         Find experiments based on regex search against its name.
 
@@ -67,7 +67,7 @@ class ExperimentLoader:
         return self.find_by_key('experiment.name', name)
 
     @lru_cache(maxsize=MAX_CACHE_SIZE)
-    def find_by_config_key(self, key: str, value: Union[str, numbers.Real, tuple]) -> List[Experiment]:
+    def find_by_config_key(self, key: str, value: Union[str, numbers.Real, tuple]) -> QuerySet:
         """
         Find experiments based on search against a configuration value.
 
@@ -85,10 +85,10 @@ class ExperimentLoader:
         key = f'config.{key}'
         cursor = self._search_collection(key, value)
         experiments = [self._make_experiment(experiment) for experiment in cursor]
-        return experiments
+        return QuerySet(experiments)
 
     @lru_cache(maxsize=MAX_CACHE_SIZE)
-    def find_by_key(self, key: str, value: Union[str, numbers.Real]) -> List[Experiment]:
+    def find_by_key(self, key: str, value: Union[str, numbers.Real]) -> QuerySet:
         """
         Find experiments based on search against a value stored in the database.
 
@@ -105,9 +105,9 @@ class ExperimentLoader:
         """
         cursor = self._search_collection(key, value)
         experiments = [self._make_experiment(experiment) for experiment in cursor]
-        return experiments
+        return QuerySet(experiments)
 
-    def find(self, query: dict) -> List[Experiment]:
+    def find(self, query: dict) -> QuerySet:
         """Find experiments based on a mongo query.
 
         Args:
@@ -118,7 +118,7 @@ class ExperimentLoader:
         """
         cursor = self._runs.find(query)
         experiments = [self._make_experiment(experiment) for experiment in cursor]
-        return experiments
+        return QuerySet(experiments)
 
     def _find_experiment(self, experiment_id: int):
         run = self._runs.find_one({'_id': experiment_id})
