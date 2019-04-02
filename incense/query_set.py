@@ -4,6 +4,7 @@ from functools import reduce
 from collections import defaultdict, OrderedDict
 from collections import UserList
 import pandas as pd
+from copy import copy
 
 ReducerT = Callable[[pd.Series], Any]
 StrOrTupleT = Union[str, tuple]
@@ -65,12 +66,12 @@ class QuerySet(UserList):
                 stratified_on[path] = path
         on = stratified_on
 
-        keys = []
-        for key in on.keys():
-            if isinstance(key, str):
-                key = tuple(key.split("."))
-            keys.append(key)
-        on = dict(zip(keys, on.values()))
+        for path, value in copy(on).items():
+            del on[path]
+            if isinstance(path, str):
+                path = tuple(path.split("."))
+            on[path] = value
+
         return on
 
     def _extract(self, exp, path, name):

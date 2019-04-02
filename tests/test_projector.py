@@ -35,4 +35,4 @@ def test_projection_with_aggregation(loader):
                                                               0.2187067011743784]}
     expected_projected = pd.DataFrame(expected_projected_data).set_index("exp_id")
     projected = exps.project(on=["config.epochs", {"metrics.training_loss": np.mean}])
-    assert_frame_equal(projected.sort_index(axis="columns"), expected_projected.sort_index(axis="columns"))
+    assert_frame_equal(projected, expected_projected)
