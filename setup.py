@@ -25,7 +25,8 @@ setup(
         'pandas>=0.23',
         'jupyterlab>=0.35',
         'pymongo>=3.7',
-        'easydict>=1.9'
+        'easydict>=1.9',
+        'future-fstrings==1.0.0',
     ],
     include_package_data=True,
     classifiers=[
