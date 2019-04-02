@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 from functools import reduce
 from operator import and_, or_
 from incense.experiment import Experiment

@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 import os
 import imghdr
 import pickle
@@ -5,7 +6,6 @@ import pickle
 import pytest
 from pytest import raises
 import pandas as pd
-import matplotlib
 from IPython.display import HTML
 import IPython
 from incense import artifact

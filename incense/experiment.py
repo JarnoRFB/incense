@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 import pandas as pd
 from typing import *
 from easydict import EasyDict

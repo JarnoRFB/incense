@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 import numbers
 from typing import *
 from pymongo import MongoClient

@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 from typing import *
 from functools import reduce
 from collections import defaultdict
