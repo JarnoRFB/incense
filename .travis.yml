@@ -1,10 +1,10 @@
 sudo: required
 language: python
 python:
-  - '3.5'
-  - '3.6'
-os:
-  - linux
+  - "3.5"
+  - "3.6"
+  - "3.7"
+os:  linux
 dist: xenial
 cache: pip
 services:
@@ -15,11 +15,13 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -y ffmpeg; fi
   - ffmpeg -hwaccels
 install:
+  - pip install tox-travis codecov
   - pip install -r requirements-dev.txt
 script:
-  - PYTHONPATH=. python example_experiment/conduct.py
-  - PYTHONPATH=. pytest --cov=incense tests/ -v
-  - codecov || echo "codecov upload failed"
+  - python example_experiment/conduct.py
+  - tox
+
+after_success: codecov
 deploy:
   provider: pypi
   user: jarnoRFB
