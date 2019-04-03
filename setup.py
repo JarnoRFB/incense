@@ -1,5 +1,7 @@
-from setuptools import setup
 import os
+
+from setuptools import setup
+
 import versioneer
 
 _here = os.path.abspath(os.path.dirname(__file__))

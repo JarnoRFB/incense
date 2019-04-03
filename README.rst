@@ -46,3 +46,15 @@ Documentation
 `demo.ipynb <demo.ipynb>`_ demonstrates the basic functionality of
 incense. You can also try it out interactively on
 `binder <https://mybinder.org/v2/gh/JarnoRFB/incense/master?urlpath=lab/tree/demo.ipynb>`_.
+
+Contributing
+------------
+We recommend using conda to set up your local development environment.
+
+::
+
+  $ conda create -n incense-dev python
+  $ conda activate incense-dev
+  $ conda install virtualenv  # Required for the precommit environments.
+  $ pip install -r requirements-dev.txt
+  $ pre-commit install

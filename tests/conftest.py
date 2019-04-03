@@ -1,5 +1,6 @@
 import pytest
 from sacred.observers import MongoObserver
+
 from incense import ExperimentLoader
 
 
