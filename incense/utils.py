@@ -24,4 +24,4 @@ def find_differing_config_keys(experiments: Iterable[Experiment]) -> set:
 
 
 def format_config(exp: Experiment, *config_keys) -> str:
-    return ' | '.join(f'{key}={exp.config[key]}' for key in config_keys)
+    return " | ".join(f"{key}={exp.config[key]}" for key in config_keys)

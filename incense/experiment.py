@@ -6,7 +6,6 @@ from incense.artifact import Artifact, content_type_to_artifact_cls
 
 
 class Experiment:
-
     def __init__(self, id_, database, grid_filesystem, data, artifact_links):
         self.id = id_
         self._data = data
@@ -17,7 +16,7 @@ class Experiment:
         self._metrics = None
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(id={self.id}, name={self.experiment.name})'
+        return f"{self.__class__.__name__}(id={self.id}, name={self.experiment.name})"
 
     def __getattr__(self, item):
         """Try to relay attribute access to easy dict, to allow dotted access."""
@@ -26,8 +25,8 @@ class Experiment:
     @classmethod
     def from_db_object(cls, database, grid_filesystem, experiment_data: dict):
         data = EasyDict(experiment_data)
-        artifacts_links = experiment_data['artifacts']
-        id_ = experiment_data['_id']
+        artifacts_links = experiment_data["artifacts"]
+        id_ = experiment_data["_id"]
         return cls(id_, database, grid_filesystem, data, artifacts_links)
 
     @property
@@ -77,13 +76,13 @@ class Experiment:
         if confirmed:
             self._delete_artifacts()
             self._delete_metrics()
-            self._database.runs.delete_one({'_id': self.id})
+            self._database.runs.delete_one({"_id": self.id})
 
     def _load_artifacts(self) -> Dict[str, Artifact]:
         artifacts = {}
         for artifact_link in self._artifacts_links:
-            artifact_file = self._grid_filesystem.get(artifact_link['file_id'])
-            name = artifact_link['name']
+            artifact_file = self._grid_filesystem.get(artifact_link["file_id"])
+            name = artifact_link["name"]
 
             try:
                 content_type = artifact_file.content_type
@@ -97,16 +96,18 @@ class Experiment:
 
     def _load_metrics(self) -> Dict[str, pd.Series]:
         metrics = {}
-        metric_db_entries = self._database.metrics.find({'run_id': self.id})
+        metric_db_entries = self._database.metrics.find({"run_id": self.id})
         for metric_db_entry in metric_db_entries:
-            metrics[metric_db_entry['name']] = pd.Series(data=metric_db_entry['values'],
-                                                         index=pd.Index(metric_db_entry['steps'], name='step'),
-                                                         name=metric_db_entry['name'])
+            metrics[metric_db_entry["name"]] = pd.Series(
+                data=metric_db_entry["values"],
+                index=pd.Index(metric_db_entry["steps"], name="step"),
+                name=metric_db_entry["name"],
+            )
         return metrics
 
     def _delete_metrics(self):
-        self._database.metrics.delete_many({'run_id': self.id})
+        self._database.metrics.delete_many({"run_id": self.id})
 
     def _delete_artifacts(self):
         for artifact_link in self._artifacts_links:
-            self._grid_filesystem.delete(artifact_link['file_id'])
+            self._grid_filesystem.delete(artifact_link["file_id"])
