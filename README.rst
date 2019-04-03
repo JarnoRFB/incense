@@ -1,5 +1,5 @@
 .. image:: https://mybinder.org/badge_logo.svg
- :target: https://mybinder.org/v2/gh/JarnoRFB/incense/master?urlpath=lab/tree/demo.ipynb
+    :target: https://mybinder.org/v2/gh/JarnoRFB/incense/master?urlpath=lab/tree/demo.ipynb
 
 .. image:: https://travis-ci.org/JarnoRFB/incense.svg?branch=master
     :target: https://travis-ci.org/JarnoRFB/incense
@@ -9,6 +9,9 @@
 
 .. image:: https://img.shields.io/lgtm/grade/python/g/JarnoRFB/incense.svg?logo=lgtm&logoWidth=18
     :target: https://lgtm.com/projects/g/JarnoRFB/incense/context:python
+
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/ambv/black
 
 Incense
 =======
