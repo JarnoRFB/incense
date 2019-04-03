@@ -1,8 +1,9 @@
 # -*- coding: future_fstrings -*-
 from functools import reduce
 from operator import and_, or_
-from incense.experiment import Experiment
 from typing import *
+
+from incense.experiment import Experiment
 
 
 def find_differing_config_keys(experiments: Iterable[Experiment]) -> set:
@@ -24,4 +25,4 @@ def find_differing_config_keys(experiments: Iterable[Experiment]) -> set:
 
 
 def format_config(exp: Experiment, *config_keys) -> str:
-    return ' | '.join(f'{key}={exp.config[key]}' for key in config_keys)
+    return " | ".join(f"{key}={exp.config[key]}" for key in config_keys)

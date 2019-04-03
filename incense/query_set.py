@@ -1,10 +1,10 @@
 # -*- coding: future_fstrings -*-
-from typing import *
-from functools import reduce
-from collections import defaultdict, OrderedDict
-from collections import UserList
-import pandas as pd
+from collections import OrderedDict, UserList, defaultdict
 from copy import copy
+from functools import reduce
+from typing import *
+
+import pandas as pd
 
 ReducerT = Callable[[pd.Series], Any]
 StrOrTupleT = Union[str, tuple]
@@ -49,7 +49,7 @@ class QuerySet(UserList):
             if rename == "last":
                 str_path = path[-1]
             elif rename is None:
-                str_path = '.'.join(path)
+                str_path = ".".join(path)
 
             if callable(reducer_or_path):
                 rename_mapping[path] = f"{str_path}_{reducer_or_path.__name__}"

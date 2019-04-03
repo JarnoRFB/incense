@@ -1,11 +1,12 @@
 # -*- coding: future_fstrings -*-
-import pickle
 import os
-from IPython.display import HTML
-from IPython import display
-import pandas as pd
+import pickle
 import warnings
 from copy import copy
+
+import pandas as pd
+from IPython import display
+from IPython.display import HTML
 
 
 class Artifact:
@@ -22,7 +23,7 @@ class Artifact:
         self._rendered = None
 
     def __repr__(self):
-        return f'{self.__class__.__name__}(name={self.name})'
+        return f"{self.__class__.__name__}(name={self.name})"
 
     def render(self):
         """Render the artifact according to its content-type."""
@@ -35,14 +36,16 @@ class Artifact:
         raise NotImplementedError
 
     def show(self):
-        warnings.warn("`show` is deprecated in favor of `render` and will removed in a future release.",
-                      DeprecationWarning,
-                      stacklevel=2)
+        warnings.warn(
+            "`show` is deprecated in favor of `render` and will removed in a future release.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return self.render()
 
-    def save(self, save_dir: str = ''):
+    def save(self, save_dir: str = ""):
         """Save artifact to disk."""
-        with open(os.path.join(save_dir, self._make_filename()), 'wb') as file:
+        with open(os.path.join(save_dir, self._make_filename()), "wb") as file:
             file.write(self.content)
 
     def as_content_type(self, content_type):
@@ -50,7 +53,7 @@ class Artifact:
         try:
             artifact_type = content_type_to_artifact_cls[content_type]
         except KeyError:
-            raise ValueError(f'Incense does not have a class that maps to content-type {content_type}')
+            raise ValueError(f"Incense does not have a class that maps to content-type {content_type}")
         else:
             return self.as_type(artifact_type)
 
@@ -66,14 +69,14 @@ class Artifact:
         return self._content
 
     def _make_filename(self):
-        parts = self.file.filename.split('/')
-        return f'{parts[-2]}_{parts[-1]}.{self.extension}'
+        parts = self.file.filename.split("/")
+        return f"{parts[-2]}_{parts[-1]}.{self.extension}"
 
 
 class ImageArtifact(Artifact):
     """Displays or saves an image artifact."""
 
-    can_render = ('image/png', 'image/jpeg')
+    can_render = ("image/png", "image/jpeg")
 
     def _render(self):
         return display.Image(data=self.content)
@@ -86,11 +89,13 @@ class MP4Artifact(Artifact):
 
     def _render(self):
         self.save()
-        return HTML(f"""
+        return HTML(
+            f"""
         <video width="640" height="480" controls autoplay>
           <source src="{self._make_filename()}" type="video/mp4">
         </video>
-        """)
+        """
+        )
 
 
 class CSVArtifact(Artifact):
@@ -117,6 +122,7 @@ class PickleArtifact(Artifact):
 
 class PDFArtifact(Artifact):
     """Displays and saves a PDF artifacts."""
+
     can_render = ("application/pdf",)
 
     # TODO probably needs jupyter extension to be able to display pdf.
