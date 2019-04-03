@@ -49,7 +49,7 @@ class QuerySet(UserList):
             if rename == "last":
                 str_path = path[-1]
             elif rename is None:
-                str_path = '.'.join(path)
+                str_path = ".".join(path)
 
             if callable(reducer_or_path):
                 rename_mapping[path] = f"{str_path}_{reducer_or_path.__name__}"
