@@ -58,6 +58,7 @@ We recommend using conda to set up your local development environment.
 
   $ conda create -n incense-dev python
   $ conda activate incense-dev
-  $ conda install virtualenv  # Required for the precommit environments.
+  # virtualenv is required for the precommit environments. tox-conda for using tox with conda.
+  $ conda install virtualenv tox-conda
   $ pip install -r requirements-dev.txt
   $ pre-commit install
