@@ -16,8 +16,9 @@ before_install:
   - ffmpeg -hwaccels
 install:
   - pip install tox-travis coverage codecov
-
+  - pip install -r requirements-dev.txt
 script:
+  - python example_experiment/conduct.py
   - tox
 
 after_success: coverage combine && codecov
