@@ -7,3 +7,5 @@ python-dotenv
 scikit-learn
 jupyterlab
 seaborn
+tox-conda
+pre-commit

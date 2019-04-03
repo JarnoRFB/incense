@@ -1,9 +1,10 @@
 # -*- coding: future_fstrings -*-
 import numbers
-from typing import *
-from pymongo import MongoClient
-import gridfs
 from functools import lru_cache
+from typing import *
+
+import gridfs
+from pymongo import MongoClient
 
 from .experiment import Experiment
 from .query_set import QuerySet
@@ -14,7 +15,7 @@ MAX_CACHE_SIZE = 32
 class ExperimentLoader:
     """Loads artifacts related to experiments."""
 
-    def __init__(self, mongo_uri=None, db_name='sacred'):
+    def __init__(self, mongo_uri=None, db_name="sacred"):
         client = MongoClient(mongo_uri)
         self._database = client[db_name]
         self._runs = self._database.runs
@@ -65,7 +66,7 @@ class ExperimentLoader:
         Returns:
             The matched experiments.
         """
-        return self.find_by_key('experiment.name', name)
+        return self.find_by_key("experiment.name", name)
 
     @lru_cache(maxsize=MAX_CACHE_SIZE)
     def find_by_config_key(self, key: str, value: Union[str, numbers.Real, tuple]) -> QuerySet:
@@ -83,7 +84,7 @@ class ExperimentLoader:
         Returns:
             The matched experiments.
         """
-        key = f'config.{key}'
+        key = f"config.{key}"
         cursor = self._search_collection(key, value)
         experiments = [self._make_experiment(experiment) for experiment in cursor]
         return QuerySet(experiments)
@@ -122,7 +123,7 @@ class ExperimentLoader:
         return QuerySet(experiments)
 
     def _find_experiment(self, experiment_id: int):
-        run = self._runs.find_one({'_id': experiment_id})
+        run = self._runs.find_one({"_id": experiment_id})
         if run is None:
             raise ValueError(f'Experiment with id {experiment_id} does not exist in database "{self._database.name}".')
         return run
@@ -132,7 +133,7 @@ class ExperimentLoader:
 
     def _search_collection(self, key, value):
         if isinstance(value, str):
-            cursor = self._runs.find({key: {'$regex': rf'{value}'}})
+            cursor = self._runs.find({key: {"$regex": rf"{value}"}})
         elif isinstance(value, numbers.Real):
             cursor = self._runs.find({key: value})
         return cursor
