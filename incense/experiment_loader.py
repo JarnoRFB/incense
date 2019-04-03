@@ -1,9 +1,10 @@
 # -*- coding: future_fstrings -*-
 import numbers
-from typing import *
-from pymongo import MongoClient
-import gridfs
 from functools import lru_cache
+from typing import *
+
+import gridfs
+from pymongo import MongoClient
 
 from .experiment import Experiment
 from .query_set import QuerySet

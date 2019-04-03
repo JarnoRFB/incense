@@ -1,13 +1,14 @@
 # -*- coding: future_fstrings -*-
-import os
 import imghdr
+import os
 import pickle
 
-import pytest
-from pytest import raises
-import pandas as pd
-from IPython.display import HTML
 import IPython
+import pandas as pd
+import pytest
+from IPython.display import HTML
+from pytest import raises
+
 from incense import artifact
 
 

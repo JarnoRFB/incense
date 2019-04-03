@@ -1,7 +1,9 @@
 # -*- coding: future_fstrings -*-
-import pandas as pd
 from typing import *
+
+import pandas as pd
 from easydict import EasyDict
+
 from incense.artifact import Artifact, content_type_to_artifact_cls
 
 

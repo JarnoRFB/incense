@@ -1,11 +1,12 @@
 # -*- coding: future_fstrings -*-
-import pickle
 import os
-from IPython.display import HTML
-from IPython import display
-import pandas as pd
+import pickle
 import warnings
 from copy import copy
+
+import pandas as pd
+from IPython import display
+from IPython.display import HTML
 
 
 class Artifact:

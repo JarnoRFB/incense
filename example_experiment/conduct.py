@@ -1,14 +1,14 @@
 # -*- coding: future_fstrings -*-
-import tensorflow as tf
 import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.metrics import confusion_matrix
 import pandas as pd
+import seaborn as sns
+import tensorflow as tf
 from matplotlib.animation import FFMpegWriter
-from tensorflow.python.keras.callbacks import Callback
 from sacred import Experiment
 from sacred.observers import MongoObserver
 from sacred.utils import apply_backspaces_and_linefeeds
+from sklearn.metrics import confusion_matrix
+from tensorflow.python.keras.callbacks import Callback
 
 
 class MetricsLogger(Callback):

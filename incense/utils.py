@@ -1,8 +1,9 @@
 # -*- coding: future_fstrings -*-
 from functools import reduce
 from operator import and_, or_
-from incense.experiment import Experiment
 from typing import *
+
+from incense.experiment import Experiment
 
 
 def find_differing_config_keys(experiments: Iterable[Experiment]) -> set:
