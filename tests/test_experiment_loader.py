@@ -40,6 +40,11 @@ def test_find_by_number_config_key(loader):
     assert exps[0].config["epochs"] == 3
 
 
+def test_find_all(loader):
+    exps = loader.find_all()
+    assert len(exps) == 3
+
+
 def test_find(loader):
     exps = loader.find({"$and": [{"config.optimizer": "sgd"}, {"config.epochs": 3}]})
     assert len(exps) == 1

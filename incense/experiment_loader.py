@@ -109,6 +109,17 @@ class ExperimentLoader:
         experiments = [self._make_experiment(experiment) for experiment in cursor]
         return QuerySet(experiments)
 
+    @lru_cache(maxsize=MAX_CACHE_SIZE)
+    def find_all(self) -> QuerySet:
+        """
+        Find all experiments stored in the database.
+
+        Returns:
+            All experiments.
+        """
+        cursor = self._runs.find()
+        return QuerySet([self._make_experiment(experiment) for experiment in cursor])
+
     def find(self, query: dict) -> QuerySet:
         """Find experiments based on a mongo query.
 
