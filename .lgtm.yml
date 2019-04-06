@@ -4,3 +4,5 @@ extraction:
       exclude:
         - versioneer.py
         - incense/_version.py
+queries:
+  - exclude: py/syntax-error
