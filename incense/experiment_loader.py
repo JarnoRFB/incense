@@ -1,6 +1,6 @@
 # -*- coding: future_fstrings -*-
 import numbers
-from functools import lru_cache
+from functools import _lru_cache_wrapper, lru_cache
 from typing import *
 
 import gridfs
@@ -133,6 +133,16 @@ class ExperimentLoader:
         experiments = [self._make_experiment(experiment) for experiment in cursor]
         return QuerySet(experiments)
 
+    def cache_clear(self):
+        """Clear all caches of all find functions.
+
+        Useful when you want to see the updates to your database."""
+        self.find_all.cache_clear()
+        self.find_by_key.cache_clear()
+        self.find_by_config_key.cache_clear()
+        self.find_by_id.cache_clear()
+        self.find_by_name.cache_clear()
+
     def _find_experiment(self, experiment_id: int):
         run = self._runs.find_one({"_id": experiment_id})
         if run is None:
@@ -140,7 +150,7 @@ class ExperimentLoader:
         return run
 
     def _make_experiment(self, experiment) -> Experiment:
-        return Experiment.from_db_object(self._database, self._grid_filesystem, experiment)
+        return Experiment.from_db_object(self._database, self._grid_filesystem, experiment, loader=self)
 
     def _search_collection(self, key, value):
         if isinstance(value, str):

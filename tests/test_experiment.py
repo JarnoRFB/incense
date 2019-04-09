@@ -69,7 +69,6 @@ def test_delete(delete_db_loader, mongo_observer):
     # Retrieve and delete experiment.
     exp = delete_db_loader.find_by_id(1)
     exp.delete(confirmed=True)
-    delete_db_loader.find_by_id.cache_clear()
     # Make sure experiment cannot be retrieved again.
     with raises(ValueError):
         exp = delete_db_loader.find_by_id(1)
