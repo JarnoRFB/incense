@@ -8,12 +8,13 @@ from incense.artifact import Artifact, content_type_to_artifact_cls
 
 
 class Experiment:
-    def __init__(self, id_, database, grid_filesystem, data, artifact_links):
+    def __init__(self, id_, database, grid_filesystem, data, artifact_links, loader):
         self.id = id_
         self._data = data
         self._artifacts_links = artifact_links
         self._database = database
         self._grid_filesystem = grid_filesystem
+        self._loader = loader
         self._artifacts = None
         self._metrics = None
 
@@ -25,11 +26,11 @@ class Experiment:
         return getattr(self._data, item)
 
     @classmethod
-    def from_db_object(cls, database, grid_filesystem, experiment_data: dict):
+    def from_db_object(cls, database, grid_filesystem, experiment_data: dict, loader):
         data = EasyDict(experiment_data)
         artifacts_links = experiment_data["artifacts"]
         id_ = experiment_data["_id"]
-        return cls(id_, database, grid_filesystem, data, artifacts_links)
+        return cls(id_, database, grid_filesystem, data, artifacts_links, loader)
 
     @property
     def artifacts(self) -> Dict[str, Artifact]:
@@ -76,9 +77,7 @@ class Experiment:
         if not confirmed:
             confirmed = input(f"Are you sure you want to delete {self}? [y/N]") == "y"
         if confirmed:
-            self._delete_artifacts()
-            self._delete_metrics()
-            self._database.runs.delete_one({"_id": self.id})
+            self._delete()
 
     def _load_artifacts(self) -> Dict[str, Artifact]:
         artifacts = {}
@@ -95,6 +94,12 @@ class Experiment:
                 artifacts[name] = artifact_type(name, artifact_file)
 
         return artifacts
+
+    def _delete(self):
+        self._delete_artifacts()
+        self._delete_metrics()
+        self._database.runs.delete_one({"_id": self.id})
+        self._loader.cache_clear()
 
     def _load_metrics(self) -> Dict[str, pd.Series]:
         metrics = {}
