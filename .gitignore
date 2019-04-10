@@ -118,5 +118,5 @@ dmypy.json
 .idea/
 
 # Outputs from example experiment
-example_experiment/confusion_matrix.png
-example_experiment/predictions.csv
+example_experiment/*
+!example_experiment/conduct.py
