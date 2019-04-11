@@ -1,8 +1,8 @@
 # -*- coding: future_fstrings -*-
-import fnmatch
 from collections import OrderedDict, UserList, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from copy import copy
+from fnmatch import fnmatch
 from functools import reduce
 from typing import *
 
@@ -99,7 +99,7 @@ class ArtifactIndexer:
     def __init__(self, experiments: QuerySet):
         self._experiments = experiments
 
-    def __getitem__(self, item):
+    def filter(self, pattern):
         """
         Get all artifacts that match a name of pattern.
 
@@ -107,7 +107,7 @@ class ArtifactIndexer:
         only on some artifacts.
 
         Args:
-            item: glob pattern, that is matched against artifact name.
+            pattern: glob pattern, that is matched against artifact name.
 
         Returns:
 
@@ -116,8 +116,11 @@ class ArtifactIndexer:
             artifact
             for exp in self._experiments
             for artifact_name, artifact in exp.artifacts.items()
-            if fnmatch.fnmatch(artifact_name, item)
+            if fnmatch(artifact_name, pattern)
         )
+
+    def __getitem__(self, item):
+        return ArtifactSet(exp.artifacts[item] for exp in self._experiments)
 
 
 class ArtifactSet(UserList):

@@ -19,7 +19,7 @@ class Artifact:
         self.name = name
         self.file = file
         self.content_type = content_type
-        self.extension = None if self.content_type is None else self.content_type.split("/")[-1]
+        self.extension = "" if self.content_type is None else self.content_type.split("/")[-1]
         self._content = None
         self._rendered = None
 
@@ -54,7 +54,7 @@ class Artifact:
         """
         if to_dir:
             os.makedirs(str(to_dir), exist_ok=True)
-        with open(os.path.join(to_dir, self._make_filename()), "wb") as file:
+        with open(os.path.join(str(to_dir), self._make_filename()), "wb") as file:
             file.write(self.content)
 
     def as_content_type(self, content_type) -> "Artifact":
