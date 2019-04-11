@@ -27,13 +27,12 @@ def test_png_artifact_render(loader):
     assert isinstance(png_artifact.render(), IPython.core.display.Image)
 
 
-def test_png_artifact_save(loader):
+def test_png_artifact_save(loader, tmpdir):
     exp = loader.find_by_id(3)
-    exp.artifacts["confusion_matrix"].save()
-    filename = "3_confusion_matrix.png"
-    assert os.path.isfile(filename)
-    assert imghdr.what(filename) == "png"
-    os.remove(filename)
+    exp.artifacts["confusion_matrix"].save(to_dir=tmpdir)
+    filepath = str(tmpdir / "3_confusion_matrix.png")
+    assert os.path.isfile(filepath)
+    assert imghdr.what(filepath) == "png"
 
 
 def test_csv_artifact_render(loader):
@@ -43,7 +42,7 @@ def test_csv_artifact_render(loader):
     assert isinstance(csv_artifact.render(), pd.DataFrame)
 
 
-def test_csv_artifact_show_warning(loader):
+def test_csv_artifact_render_warning(loader):
     exp = loader.find_by_id(3)
     csv_artifact = exp.artifacts["predictions"]
     assert isinstance(csv_artifact, artifact.CSVArtifact)
@@ -51,12 +50,11 @@ def test_csv_artifact_show_warning(loader):
         assert isinstance(csv_artifact.show(), pd.DataFrame)
 
 
-def test_mp4_artifact_save(loader):
+def test_mp4_artifact_save(loader, tmpdir):
     exp = loader.find_by_id(2)
-    exp.artifacts["accuracy_movie"].save()
-    filename = "2_accuracy_movie.mp4"
-    assert os.path.isfile(filename)
-    os.remove(filename)
+    exp.artifacts["accuracy_movie"].save(to_dir=tmpdir)
+    filepath = str(tmpdir / "2_accuracy_movie.mp4")
+    assert os.path.isfile(filepath)
 
 
 def test_mp4_artifact_render(loader):
@@ -67,13 +65,12 @@ def test_mp4_artifact_render(loader):
     os.remove("2_accuracy_movie.mp4")
 
 
-def test_csv_artifact_save(loader):
+def test_csv_artifact_save(loader, tmpdir):
     exp = loader.find_by_id(3)
-    exp.artifacts["predictions"].save()
-    filename = "3_predictions.csv"
-    assert os.path.isfile(filename)
-    assert isinstance(pd.read_csv(filename), pd.DataFrame)
-    os.remove(filename)
+    exp.artifacts["predictions"].save(to_dir=tmpdir)
+    filepath = str(tmpdir / "3_predictions.csv")
+    assert os.path.isfile(filepath)
+    assert isinstance(pd.read_csv(filepath), pd.DataFrame)
 
 
 def test_pickle_artifact_render(loader):
@@ -85,23 +82,21 @@ def test_pickle_artifact_render(loader):
     assert isinstance(pickle_artifact.render(), pd.DataFrame)
 
 
-def test_pickle_artifact_save(loader):
+def test_pickle_artifact_save(loader, tmpdir):
     exp = loader.find_by_id(3)
     pickle_artifact = exp.artifacts["predictions_df"].as_type(artifact.PickleArtifact)
-    pickle_artifact.save()
-    filename = "3_predictions_df.pickle"
+    pickle_artifact.save(to_dir=tmpdir)
+    filename = str(tmpdir / "3_predictions_df.pickle")
     assert os.path.isfile(filename)
     assert isinstance(pickle.load(open(filename, "rb")), pd.DataFrame)
-    os.remove(filename)
 
 
-def test_pdf_artifact_save(loader):
+def test_pdf_artifact_save(loader, tmpdir):
     exp = loader.find_by_id(2)
-    pdf_artifact = exp.artifacts["confusion_matrix_pdf"]
-    pdf_artifact.save()
-    filename = "2_confusion_matrix_pdf.pdf"
-    assert os.path.isfile(filename)
-    os.remove(filename)
+    pdf_artifact = exp.artifacts["confusion_matrix.pdf"]
+    pdf_artifact.save(to_dir=tmpdir)
+    filepath = str(tmpdir / "2_confusion_matrix.pdf")
+    assert os.path.isfile(filepath)
 
 
 def test_as_type(loader):
@@ -129,7 +124,14 @@ def test_as_content_type_with_unkwown_content_type(loader):
         text_artifact_as_something_strange = exp.artifacts["history"].as_content_type("something/strange")
 
 
-def test_artifact_render(loader):
+def test_artifact_render_with_unknown_content_type(loader):
     exp = loader.find_by_id(3)
     with raises(NotImplementedError):
         exp.artifacts["predictions_df"].render()
+
+
+def test_artifact_save_with_unknown_content_type(loader, tmpdir):
+    exp = loader.find_by_id(3)
+    exp.artifacts["predictions_df"].save(to_dir=tmpdir)
+    filepath = str(tmpdir / "3_predictions_df")
+    assert os.path.isfile(filepath)

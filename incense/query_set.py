@@ -1,6 +1,8 @@
 # -*- coding: future_fstrings -*-
 from collections import OrderedDict, UserList, defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from copy import copy
+from fnmatch import fnmatch
 from functools import reduce
 from typing import *
 
@@ -87,3 +89,42 @@ class QuerySet(UserList):
             return getattr(o, name)
         except AttributeError:
             return o[name]
+
+    @property
+    def artifacts(self):
+        return ArtifactIndexer(self)
+
+
+class ArtifactIndexer:
+    def __init__(self, experiments: QuerySet):
+        self._experiments = experiments
+
+    def filter(self, pattern):
+        """
+        Get all artifacts that match a name of pattern.
+
+        This method does not indicate whether the requested artifacts could be found
+        only on some artifacts.
+
+        Args:
+            pattern: glob pattern, that is matched against artifact name.
+
+        Returns:
+
+        """
+        return ArtifactSet(
+            artifact
+            for exp in self._experiments
+            for artifact_name, artifact in exp.artifacts.items()
+            if fnmatch(artifact_name, pattern)
+        )
+
+    def __getitem__(self, item):
+        return ArtifactSet(exp.artifacts[item] for exp in self._experiments)
+
+
+class ArtifactSet(UserList):
+    def save(self, to_dir, n_threads=None):
+        with ThreadPoolExecutor(max_workers=n_threads) as executer:
+            for artifact in self.data:
+                executer.submit(artifact.save, to_dir=to_dir)
