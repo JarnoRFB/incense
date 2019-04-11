@@ -3,6 +3,7 @@ import os
 import pickle
 import warnings
 from copy import copy
+from typing import *
 
 import pandas as pd
 from IPython import display
@@ -43,12 +44,20 @@ class Artifact:
         )
         return self.render()
 
-    def save(self, save_dir: str = ""):
-        """Save artifact to disk."""
-        with open(os.path.join(save_dir, self._make_filename()), "wb") as file:
+    def save(self, to_dir: str = "") -> None:
+        """
+        Save artifact to disk.
+
+        Args:
+            to_dir: Directory in which to save the artifact. Defaults to the current working directory.
+
+        """
+        if to_dir:
+            os.makedirs(str(to_dir), exist_ok=True)
+        with open(os.path.join(to_dir, self._make_filename()), "wb") as file:
             file.write(self.content)
 
-    def as_content_type(self, content_type):
+    def as_content_type(self, content_type) -> "Artifact":
         """Interpret artifact as being of content-type."""
         try:
             artifact_type = content_type_to_artifact_cls[content_type]
@@ -57,7 +66,7 @@ class Artifact:
         else:
             return self.as_type(artifact_type)
 
-    def as_type(self, artifact_type):
+    def as_type(self, artifact_type) -> "Artifact":
         self.file.seek(0)
         return artifact_type(self.name, self.file)
 
@@ -69,8 +78,8 @@ class Artifact:
         return self._content
 
     def _make_filename(self):
-        parts = self.file.filename.split("/")
-        return f"{parts[-2]}_{parts[-1]}.{self.extension}"
+        exp_id, artifact_name = self.file.filename.split("/")[-2:]
+        return f"{exp_id}_{artifact_name}" + ("" if artifact_name.endswith(self.extension) else f".{self.extension}")
 
 
 class ImageArtifact(Artifact):
@@ -133,9 +142,6 @@ class PDFArtifact(Artifact):
 
 content_type_to_artifact_cls = {}
 for cls in copy(locals()).values():
-    # print(cls)
     if isinstance(cls, type) and issubclass(cls, Artifact):
         for content_type in cls.can_render:
             content_type_to_artifact_cls[content_type] = cls
-
-# print(content_type_to_artifact_cls)

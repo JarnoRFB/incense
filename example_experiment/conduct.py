@@ -1,14 +1,16 @@
 # -*- coding: future_fstrings -*-
-import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 import tensorflow as tf
+from tensorflow.python.keras.callbacks import Callback
+
+import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.animation import FFMpegWriter
 from sacred import Experiment
 from sacred.observers import MongoObserver
 from sacred.utils import apply_backspaces_and_linefeeds
 from sklearn.metrics import confusion_matrix
-from tensorflow.python.keras.callbacks import Callback
 
 
 class MetricsLogger(Callback):
@@ -23,7 +25,7 @@ class MetricsLogger(Callback):
         self._run.log_scalar("training_acc", float(logs["acc"]), step=epoch)
 
 
-def plot_confusion_matrix(confusion_matrix, class_names, figsize=(15, 12), fontsize=14):
+def plot_confusion_matrix(confusion_matrix, class_names, figsize=(15, 12)):
     """Prints a confusion matrix, as returned by sklearn.metrics.confusion_matrix, as a heatmap.
 
     Based on https://gist.github.com/shaypal5/94c53d765083101efc0240d776a23823
@@ -141,15 +143,17 @@ def conduct(epochs, optimizer, _run):
 
     filename = "confusion_matrix.pdf"
     fig.savefig(filename)
-    _run.add_artifact(filename, name="confusion_matrix_pdf")
+    _run.add_artifact(filename)
 
     plot_accuracy_development(history, _run)
     write_csv_as_text(history, _run)
-    scalar_results = model.evaluate(x_test, y_test, verbose=0)
 
+    filename = "model.hdf5"
+    model.save(filename)
+    _run.add_artifact(filename)
+
+    scalar_results = model.evaluate(x_test, y_test, verbose=0)
     results = dict(zip(model.metrics_names, scalar_results))
-    print("Final test results")
-    print(results)
     for metric, value in results.items():
         _run.log_scalar(f"test_{metric}", value)
 
