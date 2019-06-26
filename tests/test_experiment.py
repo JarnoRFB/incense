@@ -50,7 +50,8 @@ def test_to_dict(loader):
     exp = loader.find_by_id(2)
     exp_dict = exp.to_dict()
     assert isinstance(exp_dict, dict)
-    assert exp.keys() == exp_dict.keys()
+    for x, y in zip(exp.keys(), exp_dict.keys()):
+        assert x == y
 
 
 def test_delete(delete_db_loader, mongo_observer):
@@ -83,3 +84,10 @@ def test_delete_prompt(loader, monkeypatch):
     loader.find_by_id.cache_clear()
     exp = loader.find_by_id(1)
     assert exp.id == 1
+
+
+def test_immutability(loader):
+    exp = loader.find_by_id(2)
+    meta = exp.meta
+    with raises(TypeError):
+        meta["command"] = "mutate"
