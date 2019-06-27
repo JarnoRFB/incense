@@ -8,3 +8,4 @@ scikit-learn
 jupyterlab
 seaborn
 pre-commit
+tokenize-rt==2.2.0
