@@ -50,7 +50,8 @@ def test_to_dict(loader):
     exp = loader.find_by_id(2)
     exp_dict = exp.to_dict()
     assert isinstance(exp_dict, dict)
-    for x, y in zip(exp.keys(), exp_dict.keys()):
+    # Sort for py35 compatibility.
+    for x, y in zip(sorted(exp.keys()), sorted(exp_dict.keys())):
         assert x == y
 
 
@@ -86,8 +87,13 @@ def test_delete_prompt(loader, monkeypatch):
     assert exp.id == 1
 
 
-def test_immutability(loader):
+def test_immutability__should_raise_type_error_on_item_access(loader):
     exp = loader.find_by_id(2)
-    meta = exp.meta
     with raises(TypeError):
-        meta["command"] = "mutate"
+        exp.meta["command"] = "mutate"
+
+
+def test_immutability__should_raise_attribute_error_on_attribute_access(loader):
+    exp = loader.find_by_id(2)
+    with raises(AttributeError):
+        exp.meta.command = "mutate"
