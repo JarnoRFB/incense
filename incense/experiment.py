@@ -2,7 +2,7 @@
 from typing import *
 
 import pandas as pd
-from easydict import EasyDict
+from pyrsistent import freeze, thaw
 
 from incense.artifact import Artifact, content_type_to_artifact_cls
 
@@ -27,7 +27,8 @@ class Experiment:
 
     @classmethod
     def from_db_object(cls, database, grid_filesystem, experiment_data: dict, loader):
-        data = EasyDict(experiment_data)
+        data = freeze(experiment_data)
+
         artifacts_links = experiment_data["artifacts"]
         id_ = experiment_data["_id"]
         return cls(id_, database, grid_filesystem, data, artifacts_links, loader)
@@ -66,7 +67,7 @@ class Experiment:
         Returns:
             A dict with all data from the sacred data model.
         """
-        return dict(zip(self.keys(), self.values()))
+        return thaw(self._data)
 
     def delete(self, confirmed: bool = False):
         """Delete run together with its artifacts and metrics.
