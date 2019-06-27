@@ -2,9 +2,10 @@
 pytest
 pytest-cov
 codecov
-tensorflow
+tensorflow==1.13.1
 python-dotenv
 scikit-learn
 jupyterlab
 seaborn
 pre-commit
+tokenize-rt==2.2.0
