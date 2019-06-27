@@ -4,6 +4,7 @@ from functools import _lru_cache_wrapper, lru_cache
 from typing import *
 
 import gridfs
+import pymongo
 from pymongo import MongoClient
 
 from .experiment import Experiment
@@ -86,8 +87,7 @@ class ExperimentLoader:
         """
         key = f"config.{key}"
         cursor = self._search_collection(key, value)
-        experiments = [self._make_experiment(experiment) for experiment in cursor]
-        return QuerySet(experiments)
+        return self._read_from_cursor(cursor)
 
     @lru_cache(maxsize=MAX_CACHE_SIZE)
     def find_by_key(self, key: str, value: Union[str, numbers.Real]) -> QuerySet:
@@ -106,8 +106,7 @@ class ExperimentLoader:
             The matched experiments.
         """
         cursor = self._search_collection(key, value)
-        experiments = [self._make_experiment(experiment) for experiment in cursor]
-        return QuerySet(experiments)
+        return self._read_from_cursor(cursor)
 
     @lru_cache(maxsize=MAX_CACHE_SIZE)
     def find_all(self) -> QuerySet:
@@ -120,6 +119,25 @@ class ExperimentLoader:
         cursor = self._runs.find()
         return QuerySet([self._make_experiment(experiment) for experiment in cursor])
 
+    def find_latest(self, n: int = 1, attr: str = "start_time") -> Union[Experiment, QuerySet]:
+        """Find the most recent experiments.
+
+        Caching is disabled for this method.
+
+        Args:
+            n: The number of latest experiments to retrieve.
+            attr: The attribute to determine which experiments are the most recent ones.
+
+        Returns:
+            Either the latest experiment or the set of latest experiments in case more than one were requested.
+        """
+        cursor = self._runs.find().sort(attr, pymongo.DESCENDING).limit(n)
+        experiments = [self._make_experiment(experiment) for experiment in cursor]
+        if len(experiments) == 1:
+            return experiments[0]
+        else:
+            return QuerySet(experiments)
+
     def find(self, query: dict) -> QuerySet:
         """Find experiments based on a mongo query.
 
@@ -130,6 +148,9 @@ class ExperimentLoader:
             The matched experiments.
         """
         cursor = self._runs.find(query)
+        return self._read_from_cursor(cursor)
+
+    def _read_from_cursor(self, cursor) -> QuerySet:
         experiments = [self._make_experiment(experiment) for experiment in cursor]
         return QuerySet(experiments)
 

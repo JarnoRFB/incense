@@ -1,5 +1,6 @@
 # -*- coding: future_fstrings -*-
 from pytest import raises
+from sacred import Experiment as SacredExperiment
 
 from incense.experiment import Experiment
 
@@ -43,6 +44,61 @@ def test_find_by_number_config_key(loader):
 def test_find_all(loader):
     exps = loader.find_all()
     assert len(exps) == 3
+
+
+def test_find_latest__with_newly_added_experiments(recent_db_loader, recent_mongo_observer):
+    ex = SacredExperiment("most recent")
+    ex.observers.append(recent_mongo_observer)
+    ex.add_config({"value": 1})
+
+    def run(value, _run):
+        return value
+
+    ex.main(run)
+    ex.run()
+
+    exp = recent_db_loader.find_latest()
+    assert exp.config.value == 1
+
+    ex = SacredExperiment("new most recent")
+    ex.observers.append(recent_mongo_observer)
+    ex.add_config({"value": 2})
+
+    def run(value, _run):
+        return value
+
+    ex.main(run)
+    ex.run()
+
+    exp = recent_db_loader.find_latest()
+    assert exp.config.value == 2
+
+
+def test_find_latest__for_multiple_with_newly_added_experiments(recent_db_loader, recent_mongo_observer):
+    ex = SacredExperiment("most recent")
+    ex.observers.append(recent_mongo_observer)
+    ex.add_config({"value": 1})
+
+    def run(value, _run):
+        return value
+
+    ex.main(run)
+    ex.run()
+
+    ex = SacredExperiment("new most recent")
+    ex.observers.append(recent_mongo_observer)
+    ex.add_config({"value": 2})
+
+    def run(value, _run):
+        return value
+
+    ex.main(run)
+    ex.run()
+
+    exps = recent_db_loader.find_latest(2)
+
+    assert exps[0].config.value == 2
+    assert exps[1].config.value == 1
 
 
 def test_find(loader):

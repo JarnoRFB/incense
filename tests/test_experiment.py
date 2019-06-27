@@ -53,10 +53,10 @@ def test_to_dict(loader):
     assert exp.keys() == exp_dict.keys()
 
 
-def test_delete(delete_db_loader, mongo_observer):
+def test_delete(delete_db_loader, delete_mongo_observer):
     # Add experiment to db.
     ex = Experiment("to be deleted")
-    ex.observers.append(mongo_observer)
+    ex.observers.append(delete_mongo_observer)
     ex.add_config({"value": 1})
 
     def run(value, _run):

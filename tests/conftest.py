@@ -11,7 +11,7 @@ def loader():
 
 
 @pytest.fixture
-def mongo_observer():
+def delete_mongo_observer():
     observer = MongoObserver.create(url=None, db_name="incense_delete_test")
     return observer
 
@@ -19,4 +19,16 @@ def mongo_observer():
 @pytest.fixture
 def delete_db_loader():
     loader = ExperimentLoader(mongo_uri=None, db_name="incense_delete_test")
+    return loader
+
+
+@pytest.fixture
+def recent_mongo_observer():
+    observer = MongoObserver.create(url=None, db_name="incense_recent_test")
+    return observer
+
+
+@pytest.fixture
+def recent_db_loader():
+    loader = ExperimentLoader(mongo_uri=None, db_name="incense_recent_test")
     return loader
