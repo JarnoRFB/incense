@@ -45,6 +45,22 @@ class QuerySet(UserList):
 
         return pd.DataFrame(projected).set_index("exp_id").rename(columns=rename_mapping)
 
+    def delete(self, confirmed: bool = False):
+        """Delete all experiments together with their% artifacts and metrics.
+
+        Args:
+            confirmed: Whether to skip the confirmation prompt.
+        """
+        if not confirmed:
+            confirmed = input(f"Are you sure you want to delete {self}? [y/N]") == "y"
+        if confirmed:
+            for exp in self.data:
+                exp.delete(confirmed=True)
+            print(f"Deleted {len(self.data)} experiments")
+            self.data = []
+        else:
+            print("Deletion aborted")
+
     def _make_rename_mapping(self, on, rename):
         rename_mapping = {}
         for path, reducer_or_path in on.items():

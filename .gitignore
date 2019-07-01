@@ -120,3 +120,10 @@ dmypy.json
 # Outputs from example experiment
 example_experiment/*
 !example_experiment/conduct.py
+*accuracy_movie.mp4
+*confusion_matrix.png
+*confusion_matrix.pdf
+*history.txt
+*model.hdf5
+predictions*
+artifacts/
