@@ -5,8 +5,6 @@ from sacred.observers import MongoObserver
 
 from incense import ExperimentLoader
 
-from .utils import get_mongo_uri
-
 
 def get_mongo_uri():
     if "TRAVIS" in os.environ:
