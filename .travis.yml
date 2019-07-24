@@ -16,9 +16,9 @@ before_install:
   - ffmpeg -hwaccels
 install:
   - pip install tox-travis codecov
-  - pip install -r requirements-dev.txt
+  - pip install -r .devcontainer/requirements-dev.txt
 script:
-  - python example_experiment/conduct.py
+  - python tests/example_experiment/conduct.py
   - tox
 
 after_success: codecov

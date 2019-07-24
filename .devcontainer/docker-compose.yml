@@ -1,0 +1,47 @@
+version: '3'
+services:
+
+  workspace:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    security_opt: ['label:disable']
+    user: ${FIXUID:-1000}:${FIXGID:-1000}
+    volumes:
+      - ../:/home/docker/workspace:Z
+      - vscode-remote:/home/docker/.vscode-server:Z
+      - ~/.gitconfig:/home/docker/.gitconfig:ro,z
+      - ~/.ssh:/home/docker/.ssh:z
+    ports:
+      - 127.0.0.1:8888:8888
+    command: sleep infinity
+
+  mongo:
+    image: mongo
+    ports:
+      - 127.0.0.1:27017:27017
+    restart: unless-stopped
+    environment:
+      - MONGO_DATABASE=incense_test
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 127.0.0.1:8081:8081
+    restart: unless-stopped
+    depends_on:
+      - mongo
+
+  omniboard:
+    image: vivekratnavel/omniboard:latest
+    command: ["-m", "mongo:27017:incense_test"]
+    ports:
+      - 127.0.0.1:9000:9000
+    env_file: .env
+    restart: unless-stopped
+    depends_on:
+      - mongo
+
+volumes:
+  vscode-remote:
+

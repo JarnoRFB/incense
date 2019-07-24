@@ -9,3 +9,6 @@ jupyterlab
 seaborn
 pre-commit
 tokenize-rt==2.2.0
+pylint
+black
+doc8

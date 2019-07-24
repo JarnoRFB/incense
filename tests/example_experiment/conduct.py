@@ -1,16 +1,24 @@
 # -*- coding: future_fstrings -*-
-import pandas as pd
-import seaborn as sns
-import tensorflow as tf
-from tensorflow.python.keras.callbacks import Callback
+import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import seaborn as sns
+import tensorflow as tf
 from matplotlib.animation import FFMpegWriter
 from sacred import Experiment
 from sacred.observers import MongoObserver
 from sacred.utils import apply_backspaces_and_linefeeds
 from sklearn.metrics import confusion_matrix
+from tensorflow.python.keras.callbacks import Callback
+
+
+def get_mongo_uri():
+    if "TRAVIS" in os.environ:
+        return None
+    else:
+        return "mongodb://mongo:27017"
 
 
 class MetricsLogger(Callback):
@@ -40,8 +48,6 @@ def plot_confusion_matrix(confusion_matrix, class_names, figsize=(15, 12)):
     figsize: tuple
         A 2-long tuple, the first value determining the horizontal size of the ouputted figure,
         the second determining the vertical size. Defaults to (10,7).
-    fontsize: int
-        Font size for axes labels. Defaults to 14.
 
     Returns
     -------
@@ -88,7 +94,7 @@ def write_csv_as_text(history, _run):
 ex = Experiment("example")
 ex.captured_out_filter = apply_backspaces_and_linefeeds
 
-ex.observers.append(MongoObserver.create(url=None, db_name="incense_test"))
+ex.observers.append(MongoObserver.create(url=get_mongo_uri(), db_name="incense_test"))
 
 
 @ex.config
