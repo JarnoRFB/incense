@@ -20,6 +20,9 @@
 			"**/.tox/**": true,
 			"**/.idea/**": true,
 			"**/.coverage/**": true,
-		}
+		},
+		"restructuredtext.linter.extraArgs": [
+			"--max-line-length 120"
+		]
 	}
 }
