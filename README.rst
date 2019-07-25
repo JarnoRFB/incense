@@ -52,14 +52,29 @@ incense. You can also try it out interactively on
 
 Contributing
 ------------
-We recommend using conda to set up your local development environment.
+We recommend using the `VSCode devcontainer <https://code.visualstudio.com/docs/remote/containers>`_ for development.
+It will automatically install all dependencies and start
+necessary services, such as mongoDB and JupyterLab.
+See `<.devcontainer/docker-compose.yml>`_ for details.
+Building the container for the first time may take some time.
+Once in the container run
+
+::
+
+  $ pre-commit install
+  $ python tests/example_experiment/conduct.py
+
+
+to set up the pre-commit hooks and populate the example database.
+
+Alternatively, you can use conda to set up your local development environment.
 
 ::
 
   $ conda create -n incense-dev python=3.6
   $ conda activate incense-dev
   # virtualenv is required for the precommit environments.
-  $ conda virtualenv
+  $ conda install virtualenv
   # tox-conda is required for using tox with conda.
   $ pip install tox-conda
   $ pip install -r requirements-dev.txt

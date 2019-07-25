@@ -1,0 +1,28 @@
+{
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "workspace",
+	"workspaceFolder": "/home/docker/workspace",
+	"extensions": [
+		"ms-python.python",
+		"redhat.vscode-yaml",
+		"ms-pyright.pyright",
+		"lextudio.restructuredtext"
+	],
+	"shutdownAction": "stopCompose",
+	"settings": {
+		"python.pythonPath": "/opt/conda/envs/env/bin/python",
+		"python.testing.pytestEnabled": true,
+		"files.watcherExclude": {
+			"**/.git/objects/**": true,
+			"**/.git/subtree-cache/**": true,
+			"**/.pytest_cache/**": true,
+			"**/__pycache__/**": true,
+			"**/.tox/**": true,
+			"**/.idea/**": true,
+			"**/.coverage/**": true,
+		},
+		"restructuredtext.linter.extraArgs": [
+			"--max-line-length 120"
+		]
+	}
+}

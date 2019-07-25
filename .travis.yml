@@ -1,7 +1,7 @@
 sudo: required
 language: python
 python:
-  - "3.5"
+  #  - "3.5"
   - "3.6"
   - "3.7"
 os:  linux
@@ -18,7 +18,7 @@ install:
   - pip install tox-travis codecov
   - pip install -r requirements-dev.txt
 script:
-  - python example_experiment/conduct.py
+  - python tests/example_experiment/conduct.py
   - tox
 
 after_success: codecov
