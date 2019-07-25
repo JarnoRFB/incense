@@ -1,5 +1,4 @@
 from pytest import raises
-from sacred import Experiment as SacredExperiment
 
 
 def test_repr(loader):
@@ -7,7 +6,7 @@ def test_repr(loader):
     assert repr(exps) == "QuerySet([Experiment(id=1, name=example), Experiment(id=2, name=example)])"
 
 
-def test_delete(delete_db_loader, delete_mongo_observer, capsys):
+def test_delete(delete_db_loader, delete_mongo_observer, add_exp_to_db, capsys):
     add_exp_to_db(delete_mongo_observer, config_value=1)
     add_exp_to_db(delete_mongo_observer, config_value=2)
 
@@ -23,20 +22,6 @@ def test_delete(delete_db_loader, delete_mongo_observer, capsys):
         exp = delete_db_loader.find_by_id(1)
     with raises(ValueError):
         exp = delete_db_loader.find_by_id(2)
-
-
-def add_exp_to_db(delete_mongo_observer, config_value):
-    ex = SacredExperiment("name")
-    ex.observers.append(delete_mongo_observer)
-    ex.add_config({"value": config_value})
-
-    def run(value, _run):
-        _run.log_scalar("test_metric", 1)
-        _run.add_artifact(__file__)
-        return value
-
-    ex.main(run)
-    ex.run()
 
 
 def test_delete_prompt(loader, monkeypatch, capsys):

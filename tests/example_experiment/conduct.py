@@ -15,10 +15,11 @@ from tensorflow.python.keras.callbacks import Callback
 
 
 def get_mongo_uri():
-    if "TRAVIS" in os.environ:
-        return None
-    else:
+    in_devcontainer = os.environ.get("TERM_PROGRAM") == "vscode"
+    if in_devcontainer:
         return "mongodb://mongo:27017"
+    else:
+        return None
 
 
 class MetricsLogger(Callback):
