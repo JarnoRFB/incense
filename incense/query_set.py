@@ -16,17 +16,21 @@ class QuerySet(UserList):
     def __repr__(self):
         return f"QuerySet({repr(self.data)})"
 
-    def project(self, on: List[Union[StrOrTupleT, Dict[StrOrTupleT, ReducerT]]], rename="last") -> pd.DataFrame:
+    def project(
+        self, on: List[Union[StrOrTupleT, Dict[StrOrTupleT, ReducerT]]], rename="last", on_missing: str = "raise"
+    ) -> pd.DataFrame:
         """Project a set of experiments onto a dataframe.
 
         Parameters
         ----------
         on: List of dot separated paths that point to values in the experiment model. Instead of a dot separated path
             passing a tuple is also possible. This allows for pointing to path in the model that contain dots themself.
-             Additionally, a dict of a path mapping to function applied to the
+            Additionally, a dict of a path mapping to function applied to the
             values in the experiment model can be used inplace of a path. This is useful for summarizing metrics.
         rename: The renaming strategy used to create the column names. Either "last" to take the last element in each
                 path as a column name or None to use the complete paths as column names.
+        on_missing: {"raise", "ignore"} Whether to raise an error when missing value is encountered or replace it with 
+                    a missing value. 
 
         Returns
         -------
@@ -41,7 +45,7 @@ class QuerySet(UserList):
         for exp in self.data:
             projected["exp_id"].append(exp.id)
             for path, reducer in on.items():
-                projected[path].append(self._extract(exp, path, reducer))
+                projected[path].append(self._extract(exp, path, reducer, on_missing))
 
         return pd.DataFrame(projected).set_index("exp_id").rename(columns=rename_mapping)
 
@@ -92,19 +96,25 @@ class QuerySet(UserList):
 
         return on
 
-    def _extract(self, exp, path, name):
-        extracted = reduce(lambda x, y: self._get(x, y), path, exp)
+    def _extract(self, exp, path, name, on_missing):
+        extracted = reduce(lambda x, y: self._get(x, y, on_missing), path, exp)
         if isinstance(name, str):
             return extracted
         elif callable(name):
             return name(extracted)
 
-    def _get(self, o, name):
+    def _get(self, o, name, on_missing):
         """Try getattr and getitem."""
         try:
-            return getattr(o, name)
-        except AttributeError:
-            return o[name]
+            try:
+                return getattr(o, name)
+            except AttributeError:
+                return o[name]
+        except KeyError as exc:
+            if on_missing == "ignore":
+                return None
+            else:
+                raise exc
 
     @property
     def artifacts(self):
