@@ -1,17 +1,20 @@
 # -*- coding: future_fstrings -*-
+import json
 from typing import *
 
-import pandas as pd
+import jsonpickle
 from pyrsistent import freeze, thaw
 
 from incense.artifact import Artifact, content_type_to_artifact_cls
+import pandas as pd
 
 
 class Experiment:
-    def __init__(self, id_, database, grid_filesystem, data, artifact_links, loader):
+    def __init__(self, id_, database, grid_filesystem, data, info, artifact_links, loader):
         self.id = id_
         self._data = data
         self._artifacts_links = artifact_links
+        self.info = info
         self._database = database
         self._grid_filesystem = grid_filesystem
         self._loader = loader
@@ -28,10 +31,11 @@ class Experiment:
     @classmethod
     def from_db_object(cls, database, grid_filesystem, experiment_data: dict, loader):
         data = freeze(experiment_data)
+        info = freeze(jsonpickle.loads(json.dumps(experiment_data['info'])))
 
         artifacts_links = experiment_data["artifacts"]
         id_ = experiment_data["_id"]
-        return cls(id_, database, grid_filesystem, data, artifacts_links, loader)
+        return cls(id_, database, grid_filesystem, data, info, artifacts_links, loader)
 
     @property
     def artifacts(self) -> Dict[str, Artifact]:
@@ -76,7 +80,8 @@ class Experiment:
             confirmed: Whether to skip the confirmation prompt.
         """
         if not confirmed:
-            confirmed = input(f"Are you sure you want to delete {self}? [y/N]") == "y"
+            confirmed = input(
+                f"Are you sure you want to delete {self}? [y/N]") == "y"
         if confirmed:
             self._delete()
 
@@ -89,7 +94,8 @@ class Experiment:
             try:
                 content_type = artifact_file.content_type
                 artifact_type = content_type_to_artifact_cls[content_type]
-                artifacts[name] = artifact_type(name, artifact_file, content_type=content_type)
+                artifacts[name] = artifact_type(
+                    name, artifact_file, content_type=content_type)
             except KeyError:
                 artifact_type = Artifact
                 artifacts[name] = artifact_type(name, artifact_file)
