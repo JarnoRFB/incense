@@ -1,5 +1,7 @@
 # -*- coding: future_fstrings -*-
+import collections
 from datetime import datetime
+from fractions import Fraction
 
 import pandas as pd
 from pytest import raises
@@ -97,3 +99,29 @@ def test_immutability__should_raise_attribute_error_on_attribute_access(loader):
     exp = loader.find_by_id(2)
     with raises(AttributeError):
         exp.meta.command = "mutate"
+
+
+def test_info(info_db_loader, info_db_loader_pickled, info_mongo_observer):
+    # Add experiment to db.
+    ex = Experiment("info experiment")
+    ex.observers.append(info_mongo_observer)
+    ex.add_config({"value": 1})
+
+    def run(value, _run):
+        _run.info["number"] = 13
+        _run.info["list"] = [1, 2]
+        _run.info["object"] = Fraction(3, 4)
+        return value
+
+    ex.main(run)
+    ex.run()
+    # Retrieve and delete experiment.
+    exp_unpickled = info_db_loader.find_by_id(1)
+    exp_pickled = info_db_loader_pickled.find_by_id(1)
+
+    assert exp_unpickled.info["number"] == exp_pickled.info["number"] == 13
+    assert exp_unpickled.info["list"] == exp_pickled.info["list"] == [1, 2]
+    assert exp_unpickled.info["object"] == Fraction(3, 4)
+    assert isinstance(exp_pickled.info["object"], collections.Mapping)
+
+    exp_unpickled.delete(confirmed=True)
