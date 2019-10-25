@@ -10,11 +10,10 @@ import pandas as pd
 
 
 class Experiment:
-    def __init__(self, id_, database, grid_filesystem, data, info, artifact_links, loader):
+    def __init__(self, id_, database, grid_filesystem, data, artifact_links, loader):
         self.id = id_
         self._data = data
         self._artifacts_links = artifact_links
-        self.info = info
         self._database = database
         self._grid_filesystem = grid_filesystem
         self._loader = loader
@@ -29,13 +28,16 @@ class Experiment:
         return getattr(self._data, item)
 
     @classmethod
-    def from_db_object(cls, database, grid_filesystem, experiment_data: dict, loader):
+    def from_db_object(cls, database, grid_filesystem, experiment_data: dict, loader,
+                       unpickle: bool = True):
+        if unpickle:
+            experiment_data['info'] = jsonpickle.loads(
+                json.dumps(experiment_data['info']))
         data = freeze(experiment_data)
-        info = freeze(jsonpickle.loads(json.dumps(experiment_data['info'])))
 
         artifacts_links = experiment_data["artifacts"]
         id_ = experiment_data["_id"]
-        return cls(id_, database, grid_filesystem, data, info, artifacts_links, loader)
+        return cls(id_, database, grid_filesystem, data, artifacts_links, loader)
 
     @property
     def artifacts(self) -> Dict[str, Artifact]:

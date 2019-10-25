@@ -23,6 +23,7 @@ setup(
     python_requires=">=3.5",
     install_requires=[
         "sacred",
+        "jsonpickle",
         "matplotlib>=3",
         "pandas>=0.23",
         "jupyterlab>=0.35",
