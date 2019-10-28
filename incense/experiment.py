@@ -1,10 +1,12 @@
 # -*- coding: future_fstrings -*-
+import json
 from typing import *
 
-import pandas as pd
+import jsonpickle
 from pyrsistent import freeze, thaw
 
 from incense.artifact import Artifact, content_type_to_artifact_cls
+import pandas as pd
 
 
 class Experiment:
@@ -26,7 +28,11 @@ class Experiment:
         return getattr(self._data, item)
 
     @classmethod
-    def from_db_object(cls, database, grid_filesystem, experiment_data: dict, loader):
+    def from_db_object(cls, database, grid_filesystem, experiment_data: dict, loader,
+                       unpickle: bool = True):
+        if unpickle:
+            experiment_data['info'] = jsonpickle.loads(
+                json.dumps(experiment_data['info']))
         data = freeze(experiment_data)
 
         artifacts_links = experiment_data["artifacts"]
@@ -76,7 +82,8 @@ class Experiment:
             confirmed: Whether to skip the confirmation prompt.
         """
         if not confirmed:
-            confirmed = input(f"Are you sure you want to delete {self}? [y/N]") == "y"
+            confirmed = input(
+                f"Are you sure you want to delete {self}? [y/N]") == "y"
         if confirmed:
             self._delete()
 
@@ -89,7 +96,8 @@ class Experiment:
             try:
                 content_type = artifact_file.content_type
                 artifact_type = content_type_to_artifact_cls[content_type]
-                artifacts[name] = artifact_type(name, artifact_file, content_type=content_type)
+                artifacts[name] = artifact_type(
+                    name, artifact_file, content_type=content_type)
             except KeyError:
                 artifact_type = Artifact
                 artifacts[name] = artifact_type(name, artifact_file)

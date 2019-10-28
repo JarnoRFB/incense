@@ -1,10 +1,9 @@
 import os
 
 import pytest
+from incense import ExperimentLoader
 from sacred import Experiment as SacredExperiment
 from sacred.observers import MongoObserver
-
-from incense import ExperimentLoader
 
 
 def get_mongo_uri():
@@ -21,6 +20,7 @@ TEST_DB_NAME = "incense_test"
 RECENT_DB_NAME = "incense_recent_test"
 DELETE_DB_NAME = "incense_delete_test"
 HETEROGENOUS_DB_NAME = "incense_heterogenous_test"
+INFO_DB_NAME = "incense_info_test"
 
 
 @pytest.fixture
@@ -62,6 +62,24 @@ def heterogenous_mongo_observer():
 @pytest.fixture
 def heterogenous_db_loader():
     loader = ExperimentLoader(mongo_uri=MONGO_URI, db_name=HETEROGENOUS_DB_NAME)
+    return loader
+
+
+@pytest.fixture
+def info_mongo_observer():
+    observer = MongoObserver.create(url=MONGO_URI, db_name=INFO_DB_NAME)
+    return observer
+
+
+@pytest.fixture
+def info_db_loader():
+    loader = ExperimentLoader(mongo_uri=MONGO_URI, db_name=INFO_DB_NAME)
+    return loader
+
+
+@pytest.fixture
+def info_db_loader_pickled():
+    loader = ExperimentLoader(mongo_uri=MONGO_URI, db_name=INFO_DB_NAME, unpickle=False)
     return loader
 
 

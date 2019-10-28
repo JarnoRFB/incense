@@ -10,17 +10,20 @@ from pymongo import MongoClient
 from .experiment import Experiment
 from .query_set import QuerySet
 
+
 MAX_CACHE_SIZE = 32
 
 
 class ExperimentLoader:
     """Loads artifacts related to experiments."""
 
-    def __init__(self, mongo_uri=None, db_name="sacred"):
+    def __init__(self, mongo_uri=None, db_name="sacred",
+                 unpickle: bool = True):
         client = MongoClient(mongo_uri)
         self._database = client[db_name]
         self._runs = self._database.runs
         self._grid_filesystem = gridfs.GridFS(self._database)
+        self._unpickle = unpickle
 
     def find_by_ids(self, experiment_ids: Iterable[int]) -> QuerySet:
         """
@@ -171,7 +174,8 @@ class ExperimentLoader:
         return run
 
     def _make_experiment(self, experiment) -> Experiment:
-        return Experiment.from_db_object(self._database, self._grid_filesystem, experiment, loader=self)
+        return Experiment.from_db_object(self._database, self._grid_filesystem, experiment, loader=self,
+                                         unpickle=self._unpickle)
 
     def _search_collection(self, key, value):
         if isinstance(value, str):
