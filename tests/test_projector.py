@@ -32,7 +32,7 @@ def test_projection_with_aggregation(loader):
     expected_projected_data = {
         "exp_id": [1, 2, 3],
         "epochs": [1, 3, 1],
-        "training_loss_mean": [0.6378391059716543, 0.425261557425393, 0.2187067011743784],
+        "training_loss_mean": [0.6407258245944977, 0.42567836346162685, 0.2221361954788367],
     }
     expected_projected = pd.DataFrame(expected_projected_data).set_index("exp_id")
     projected = exps.project(on=["config.epochs", {"metrics.training_loss": np.mean}])

@@ -15,7 +15,7 @@ def test_repr(loader):
 
 def test_metrics(loader):
     exp = loader.find_by_id(3)
-    metric_names = ["training_loss", "training_acc", "test_loss", "test_acc"]
+    metric_names = ["training_loss", "training_accuracy", "test_loss", "test_accuracy"]
     for metric_name in metric_names:
         assert metric_name in exp.metrics.keys()
         assert isinstance(exp.metrics[metric_name], pd.Series)

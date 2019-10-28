@@ -11,7 +11,6 @@ from sacred import Experiment
 from sacred.observers import MongoObserver
 from sacred.utils import apply_backspaces_and_linefeeds
 from sklearn.metrics import confusion_matrix
-from tensorflow.python.keras.callbacks import Callback
 
 
 def get_mongo_uri():
@@ -22,7 +21,7 @@ def get_mongo_uri():
         return None
 
 
-class MetricsLogger(Callback):
+class MetricsLogger(tf.keras.callbacks.Callback):
     """Callback to log loss and accuracy to sacred database."""
 
     def __init__(self, run):
@@ -31,30 +30,10 @@ class MetricsLogger(Callback):
 
     def on_epoch_end(self, epoch, logs):
         self._run.log_scalar("training_loss", float(logs["loss"]), step=epoch)
-        self._run.log_scalar("training_acc", float(logs["acc"]), step=epoch)
+        self._run.log_scalar("training_accuracy", float(logs["accuracy"]), step=epoch)
 
 
 def plot_confusion_matrix(confusion_matrix, class_names, figsize=(15, 12)):
-    """Prints a confusion matrix, as returned by sklearn.metrics.confusion_matrix, as a heatmap.
-
-    Based on https://gist.github.com/shaypal5/94c53d765083101efc0240d776a23823
-
-    Arguments
-    ---------
-    confusion_matrix: numpy.ndarray
-        The numpy.ndarray object returned from a call to sklearn.metrics.confusion_matrix.
-        Similarly constructed ndarrays can also be used.
-    class_names: list
-        An ordered list of class names, in the order they index the given confusion matrix.
-    figsize: tuple
-        A 2-long tuple, the first value determining the horizontal size of the ouputted figure,
-        the second determining the vertical size. Defaults to (10,7).
-
-    Returns
-    -------
-    matplotlib.figure.Figure
-        The resulting confusion matrix figure
-    """
     df_cm = pd.DataFrame(confusion_matrix, index=class_names, columns=class_names)
     fig, ax = plt.subplots(figsize=figsize)
     heatmap = sns.heatmap(df_cm, annot=False, cmap="Blues")
@@ -68,13 +47,13 @@ def plot_accuracy_development(history, _run):
     writer = FFMpegWriter(fps=1)
     filename = "accuracy_movie.mp4"
     with writer.saving(fig, filename, 600):
-        acc = history.history["acc"]
-        x = list(range(1, len(acc) + 1))
-        y = acc
-        ax.set(xlim=[0.9, len(acc) + 0.1], ylim=[0, 1], xlabel="epoch", ylabel="accuracy")
+        accuracy = history.history["accuracy"]
+        x = list(range(1, len(accuracy) + 1))
+        y = accuracy
+        ax.set(xlim=[0.9, len(accuracy) + 0.1], ylim=[0, 1], xlabel="epoch", ylabel="accuracy")
         [acc_line] = ax.plot(x, y, "o-")
 
-        for i in range(1, len(acc) + 1):
+        for i in range(1, len(accuracy) + 1):
             acc_line.set_data(x[:i], y[:i])
 
             writer.grab_frame()
@@ -85,9 +64,9 @@ def plot_accuracy_development(history, _run):
 def write_csv_as_text(history, _run):
     filename = "history.txt"
     with open(filename, "w") as handle:
-        handle.write("acc, loss\n")
-        for acc, loss in zip(history.history["acc"], history.history["loss"]):
-            handle.write(f"{acc}, {loss}\n")
+        handle.write("accuracy, loss\n")
+        for accuracy, loss in zip(history.history["accuracy"], history.history["loss"]):
+            handle.write(f"{accuracy}, {loss}\n")
 
     _run.add_artifact(filename=filename, name="history")
 
@@ -95,7 +74,7 @@ def write_csv_as_text(history, _run):
 ex = Experiment("example")
 ex.captured_out_filter = apply_backspaces_and_linefeeds
 
-ex.observers.append(MongoObserver.create(url=get_mongo_uri(), db_name="incense_test"))
+ex.observers.append(MongoObserver(url=get_mongo_uri(), db_name="incense_test"))
 
 
 @ex.config
@@ -164,7 +143,7 @@ def conduct(epochs, optimizer, _run):
     for metric, value in results.items():
         _run.log_scalar(f"test_{metric}", value)
 
-    return results["acc"]
+    return results["accuracy"]
 
 
 if __name__ == "__main__":
