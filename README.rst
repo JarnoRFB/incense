@@ -34,13 +34,9 @@ text that contains the interpretation.
 
 Installation
 ------------
-To use incense you need the newest development version of sacred, so that
-content-types of artifacts are automatically detected. Therefore, you first
-have to install sacred from github and then install incense from PyPI.
 
 ::
 
-   pip install git+https://github.com/IDSIA/sacred.git
    pip install incense
 
 Documentation
