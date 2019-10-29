@@ -98,7 +98,6 @@ def make_model():
 
 @ex.command
 def conduct(epochs, optimizer, _run):
-    tf.random.set_seed(42)
 
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     x_train = x_train / 255.0
@@ -149,6 +148,7 @@ def conduct(epochs, optimizer, _run):
 
 
 if __name__ == "__main__":
+    tf.random.set_seed(42)
     ex.run("conduct")
     ex.run("conduct", config_updates={"epochs": 3})
     ex.run("conduct", config_updates={"optimizer": "adam"})
