@@ -1,9 +1,10 @@
 import os
 
 import pytest
-from incense import ExperimentLoader
 from sacred import Experiment as SacredExperiment
 from sacred.observers import MongoObserver
+
+from incense import ExperimentLoader
 
 
 def get_mongo_uri():
@@ -31,7 +32,7 @@ def loader():
 
 @pytest.fixture
 def delete_mongo_observer():
-    observer = MongoObserver.create(url=MONGO_URI, db_name=DELETE_DB_NAME)
+    observer = MongoObserver(url=MONGO_URI, db_name=DELETE_DB_NAME)
     return observer
 
 
@@ -43,7 +44,7 @@ def delete_db_loader():
 
 @pytest.fixture
 def recent_mongo_observer():
-    observer = MongoObserver.create(url=MONGO_URI, db_name=RECENT_DB_NAME)
+    observer = MongoObserver(url=MONGO_URI, db_name=RECENT_DB_NAME)
     return observer
 
 
@@ -55,7 +56,7 @@ def recent_db_loader():
 
 @pytest.fixture
 def heterogenous_mongo_observer():
-    observer = MongoObserver.create(url=MONGO_URI, db_name=HETEROGENOUS_DB_NAME)
+    observer = MongoObserver(url=MONGO_URI, db_name=HETEROGENOUS_DB_NAME)
     return observer
 
 
@@ -67,7 +68,7 @@ def heterogenous_db_loader():
 
 @pytest.fixture
 def info_mongo_observer():
-    observer = MongoObserver.create(url=MONGO_URI, db_name=INFO_DB_NAME)
+    observer = MongoObserver(url=MONGO_URI, db_name=INFO_DB_NAME)
     return observer
 
 

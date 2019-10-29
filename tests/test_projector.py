@@ -23,7 +23,6 @@ def test_projection_without_renaming(loader):
     }
     expected_projected = pd.DataFrame(expected_projected_data).set_index("exp_id")
     projected = exps.project(on=["config.epochs", "config.optimizer"], rename=None)
-
     assert_frame_equal(projected.sort_index(axis="columns"), expected_projected.sort_index(axis="columns"))
 
 
@@ -32,11 +31,13 @@ def test_projection_with_aggregation(loader):
     expected_projected_data = {
         "exp_id": [1, 2, 3],
         "epochs": [1, 3, 1],
-        "training_loss_mean": [0.6378391059716543, 0.425261557425393, 0.2187067011743784],
+        "training_loss_mean": [0.6404899107933044, 0.42554907141460313, 0.22108366647909086],
     }
     expected_projected = pd.DataFrame(expected_projected_data).set_index("exp_id")
     projected = exps.project(on=["config.epochs", {"metrics.training_loss": np.mean}])
-    assert_frame_equal(projected.sort_index(axis="columns"), expected_projected.sort_index(axis="columns"))
+    assert_frame_equal(
+        projected.sort_index(axis="columns"), expected_projected.sort_index(axis="columns"), check_less_precise=True
+    )
 
 
 def test_projection_with_heterogenous_formats(heterogenous_db_loader, heterogenous_mongo_observer, add_exp_to_db):

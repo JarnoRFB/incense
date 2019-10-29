@@ -11,7 +11,7 @@ RUN apt-get update \
     && apt-get -y install --no-install-recommends apt-utils 2>&1
 
 # Install git, process tools, lsb-release (common in install instructions for CLIs)
-RUN apt-get -y install git procps lsb-release ffmpeg vim
+RUN apt-get -y install git procps lsb-release ffmpeg vim exuberant-ctags
 
 # Install any missing dependencies for enhanced language service
 RUN apt-get install -y libicu[0-9][0-9]
