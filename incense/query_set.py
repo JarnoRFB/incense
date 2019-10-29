@@ -4,12 +4,14 @@ from concurrent.futures import ThreadPoolExecutor
 from copy import copy
 from fnmatch import fnmatch
 from functools import reduce
-from typing import *
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 
+from .experiment import Experiment
+
 ReducerT = Callable[[pd.Series], Any]
-StrOrTupleT = Union[str, tuple]
+StrOrTupleT = Union[str, Tuple[str, ...]]
 
 
 class QuerySet(UserList):
@@ -36,15 +38,15 @@ class QuerySet(UserList):
         -------
         A dataframe containing the projected values with the experiment id set as index.
         """
-        on = self._stratify_mapping(on)
+        stratified_on = self._stratify_mapping(on)
 
         # TODO introduce possibility to pass a list to `rename` once we don't need to support 3.5 any longer.
-        rename_mapping = self._make_rename_mapping(on, rename)
+        rename_mapping = self._make_rename_mapping(stratified_on, rename)
 
-        projected = defaultdict(list)
+        projected: Dict[StrOrTupleT, List[Any]] = defaultdict(list)
         for exp in self.data:
             projected["exp_id"].append(exp.id)
-            for path, reducer in on.items():
+            for path, reducer in stratified_on.items():
                 projected[path].append(self._extract(exp, path, reducer, on_missing))
 
         return pd.DataFrame(projected).set_index("exp_id").rename(columns=rename_mapping)
@@ -61,17 +63,19 @@ class QuerySet(UserList):
             for exp in self.data:
                 exp.delete(confirmed=True)
             print(f"Deleted {len(self.data)} experiments")
-            self.data = []
+            self.data: List[Experiment] = []
         else:
             print("Deletion aborted")
 
-    def _make_rename_mapping(self, on, rename):
+    def _make_rename_mapping(self, on, rename: Optional[str]) -> Dict[str, str]:
         rename_mapping = {}
         for path, reducer_or_path in on.items():
             if rename == "last":
                 str_path = path[-1]
             elif rename is None:
                 str_path = ".".join(path)
+            else:
+                raise ValueError(f'rename can be either "last" or None, but was {rename}.')
 
             if callable(reducer_or_path):
                 rename_mapping[path] = f"{str_path}_{reducer_or_path.__name__}"
@@ -79,8 +83,8 @@ class QuerySet(UserList):
                 rename_mapping[path] = str_path
         return rename_mapping
 
-    def _stratify_mapping(self, on):
-        stratified_on = OrderedDict()
+    def _stratify_mapping(self, on) -> Dict[Tuple[str, ...], Union[str, ReducerT]]:
+        stratified_on: Dict[StrOrTupleT, Union[StrOrTupleT, ReducerT]] = OrderedDict()
         for path in on:
             if isinstance(path, dict):
                 stratified_on.update(path)
@@ -96,7 +100,7 @@ class QuerySet(UserList):
 
         return on
 
-    def _extract(self, exp, path, name, on_missing):
+    def _extract(self, exp: Experiment, path, name, on_missing):
         extracted = reduce(lambda x, y: self._get(x, y, on_missing), path, exp)
         if isinstance(name, str):
             return extracted

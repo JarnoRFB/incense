@@ -13,7 +13,7 @@ from IPython.display import HTML
 class Artifact:
     """Displays or saves an artifact."""
 
-    can_render = tuple()
+    can_render: Set[str] = set()
 
     def __init__(self, name: str, file, content_type: str = None):
         self.name = name
@@ -85,7 +85,7 @@ class Artifact:
 class ImageArtifact(Artifact):
     """Displays or saves an image artifact."""
 
-    can_render = ("image/png", "image/jpeg")
+    can_render = {"image/png", "image/jpeg"}
 
     def _render(self):
         return display.Image(data=self.content)
@@ -94,7 +94,7 @@ class ImageArtifact(Artifact):
 class MP4Artifact(Artifact):
     """Displays or saves a MP4 artifact"""
 
-    can_render = ("video/mp4",)
+    can_render = {"video/mp4"}
 
     def _render(self):
         self.save()
@@ -110,7 +110,7 @@ class MP4Artifact(Artifact):
 class CSVArtifact(Artifact):
     """Displays and saves a CSV artifact"""
 
-    can_render = ("text/csv",)
+    can_render = {"text/csv"}
 
     def _render(self):
         return pd.read_csv(self.file)
@@ -119,7 +119,7 @@ class CSVArtifact(Artifact):
 class PickleArtifact(Artifact):
     """Displays and saves a Pickle artifact"""
 
-    can_render = tuple()
+    can_render: Set[str] = set()
 
     def __init__(self, name: str, file, content_type: str = None):
         super().__init__(name, file, content_type)
@@ -132,7 +132,7 @@ class PickleArtifact(Artifact):
 class PDFArtifact(Artifact):
     """Displays and saves a PDF artifacts."""
 
-    can_render = ("application/pdf",)
+    can_render = {"application/pdf"}
 
     # TODO probably needs jupyter extension to be able to display pdf.
     # def _render(self):
