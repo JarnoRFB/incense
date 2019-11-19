@@ -3,7 +3,12 @@ import collections
 from datetime import datetime
 from fractions import Fraction
 
+import numpy as np
 import pandas as pd
+import pytest
+import sacred
+from numpy.testing import assert_array_equal
+from pandas.testing import assert_frame_equal
 from pytest import raises
 from sacred import Experiment
 
@@ -125,3 +130,49 @@ def test_info(info_db_loader, info_db_loader_pickled, info_mongo_observer):
     assert isinstance(exp_pickled.info["object"], collections.Mapping)
 
     exp_unpickled.delete(confirmed=True)
+
+
+@pytest.fixture
+def experiment_with_numpy_in_info(info_mongo_observer, info_db_loader) -> sacred.run.Run:
+    # Add experiment to db.
+    ex = Experiment("info experiment")
+    ex.observers.append(info_mongo_observer)
+    ex.add_config({"value": 1})
+
+    def run(value, _run):
+        _run.info["array"] = np.array([1, 2, 3])
+        return value
+
+    ex.main(run)
+    yield ex.run()
+
+    # Retrieve and delete experiment.
+    info_db_loader.find_by_id(1).delete(confirmed=True)
+
+
+def test_info_allows_restoring_numpy_arrays(experiment_with_numpy_in_info, info_db_loader):
+    exp_unpickled = info_db_loader.find_by_id(experiment_with_numpy_in_info._id)
+    assert_array_equal(exp_unpickled.info["array"], experiment_with_numpy_in_info.info["array"])
+
+
+@pytest.fixture
+def experiment_with_pandas_in_info(info_mongo_observer, info_db_loader) -> sacred.run.Run:
+    # Add experiment to db.
+    ex = Experiment("info experiment")
+    ex.observers.append(info_mongo_observer)
+    ex.add_config({"value": 1})
+
+    def run(value, _run):
+        _run.info["dataframe"] = pd.DataFrame({"a": [1, 2, 3], "b": ["1", "2", "3"]})
+        return value
+
+    ex.main(run)
+    yield ex.run()
+
+    # Retrieve and delete experiment.
+    info_db_loader.find_by_id(1).delete(confirmed=True)
+
+
+def test_info_allows_restoring_pandas_dataframes(experiment_with_pandas_in_info, info_db_loader):
+    exp_unpickled = info_db_loader.find_by_id(experiment_with_pandas_in_info._id)
+    assert_frame_equal(exp_unpickled.info["dataframe"], experiment_with_pandas_in_info.info["dataframe"])

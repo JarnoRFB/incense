@@ -1,5 +1,8 @@
 import os
 
+import jsonpickle.handlers
+import numpy as np
+import pandas as pd
 import pytest
 from sacred import Experiment as SacredExperiment
 from sacred.observers import MongoObserver
@@ -8,7 +11,7 @@ from incense import ExperimentLoader
 
 
 def get_mongo_uri():
-    in_devcontainer = os.environ.get("TERM_PROGRAM") == "vscode"
+    in_devcontainer = os.environ.get("TERM_PROGRAM") == "vscode" or os.environ.get("HOME") == "/home/docker"
     if in_devcontainer:
         return "mongodb://mongo:27017"
     else:
@@ -74,6 +77,9 @@ def info_mongo_observer():
 
 @pytest.fixture
 def info_db_loader():
+    # Unregister handlers to simulate that sacred is not currently imported.
+    jsonpickle.handlers.unregister(np.ndarray)
+    jsonpickle.handlers.unregister(pd.DataFrame)
     loader = ExperimentLoader(mongo_uri=MONGO_URI, db_name=INFO_DB_NAME)
     return loader
 
