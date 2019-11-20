@@ -64,9 +64,6 @@ def test_find_latest__with_newly_added_experiments(recent_db_loader, recent_mong
     ex.observers.append(recent_mongo_observer)
     ex.add_config({"value": 2})
 
-    def run(value, _run):
-        return value
-
     ex.main(run)
     ex.run()
 
@@ -88,9 +85,6 @@ def test_find_latest__for_multiple_with_newly_added_experiments(recent_db_loader
     ex = SacredExperiment("new most recent")
     ex.observers.append(recent_mongo_observer)
     ex.add_config({"value": 2})
-
-    def run(value, _run):
-        return value
 
     ex.main(run)
     ex.run()

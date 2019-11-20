@@ -14,3 +14,4 @@ repos:
    rev: 'v0.730'
    hooks:
    - id: mypy
+     additional_dependencies: ['future-fstrings==1.0.0']
