@@ -57,7 +57,7 @@ class Artifact:
         with open(os.path.join(str(to_dir), self._make_filename()), "wb") as file:
             file.write(self.content)
 
-    def as_content_type(self, content_type) -> "Artifact":
+    def as_content_type(self, content_type: str) -> "Artifact":
         """Interpret artifact as being of content-type."""
         try:
             artifact_type = content_type_to_artifact_cls[content_type]
@@ -78,7 +78,8 @@ class Artifact:
         return self._content
 
     def _make_filename(self):
-        exp_id, artifact_name = self.file.filename.split("/")[-2:]
+        # TODO does this work on gridfs file?
+        exp_id, artifact_name = self.file.name.split("/")[-2:]
         return f"{exp_id}_{artifact_name}" + ("" if artifact_name.endswith(self.extension) else f".{self.extension}")
 
 

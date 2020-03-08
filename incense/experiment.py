@@ -1,21 +1,22 @@
 # -*- coding: future_fstrings -*-
 import json
+from pathlib import Path
 from typing import *
 
 import jsonpickle
+import pandas as pd
 from pyrsistent import freeze, thaw
 
 from incense.artifact import Artifact, content_type_to_artifact_cls
-import pandas as pd
 
 
 class Experiment:
     def __init__(self, id_, database, grid_filesystem, data, artifact_links, loader):
         self.id = id_
-        self._data = data
-        self._artifacts_links = artifact_links
         self._database = database
         self._grid_filesystem = grid_filesystem
+        self._data = data
+        self._artifacts_links = artifact_links
         self._loader = loader
         self._artifacts = None
         self._metrics = None
@@ -28,11 +29,9 @@ class Experiment:
         return getattr(self._data, item)
 
     @classmethod
-    def from_db_object(cls, database, grid_filesystem, experiment_data: dict, loader,
-                       unpickle: bool = True):
+    def from_db_object(cls, database, grid_filesystem, experiment_data: dict, loader, unpickle: bool = True):
         if unpickle:
-            experiment_data['info'] = jsonpickle.loads(
-                json.dumps(experiment_data['info']))
+            experiment_data["info"] = jsonpickle.loads(json.dumps(experiment_data["info"]))
         data = freeze(experiment_data)
 
         artifacts_links = experiment_data["artifacts"]
@@ -82,8 +81,7 @@ class Experiment:
             confirmed: Whether to skip the confirmation prompt.
         """
         if not confirmed:
-            confirmed = input(
-                f"Are you sure you want to delete {self}? [y/N]") == "y"
+            confirmed = input(f"Are you sure you want to delete {self}? [y/N]") == "y"
         if confirmed:
             self._delete()
 
@@ -96,8 +94,7 @@ class Experiment:
             try:
                 content_type = artifact_file.content_type
                 artifact_type = content_type_to_artifact_cls[content_type]
-                artifacts[name] = artifact_type(
-                    name, artifact_file, content_type=content_type)
+                artifacts[name] = artifact_type(name, artifact_file, content_type=content_type)
             except KeyError:
                 artifact_type = Artifact
                 artifacts[name] = artifact_type(name, artifact_file)
@@ -127,3 +124,57 @@ class Experiment:
     def _delete_artifacts(self):
         for artifact_link in self._artifacts_links:
             self._grid_filesystem.delete(artifact_link["file_id"])
+
+
+class FileSystemExperiment:
+    def __init__(self, id_, data: Dict[str, Any], artifacts: Dict[str, Artifact], metrics: Dict[str, pd.Series]):
+        self.id = id_
+        self._data = data
+        self.artifacts = artifacts
+        self.metrics = metrics
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(id={self.id}, name={self.experiment.name})"
+
+    def __getattr__(self, item):
+        """Try to relay attribute access to easy dict, to allow dotted access."""
+        return getattr(self._data, item)
+
+    @classmethod
+    def from_run_dir(cls, run_dir: Path):
+        id_ = run_dir.name
+        config = _load_json_from_path(run_dir / "config.json")
+        run_data = _load_json_from_path(run_dir / "run.json")
+        cout = (run_dir / "cout.txt").read_text()
+        run_data["config"] = config
+        run_data["captured_out"] = cout
+        metrics = cls._load_metrics(run_dir / "metrics.json")
+        artifacts = cls._load_artifacts(run_dir)
+        return cls(id_, freeze(run_data), artifacts, metrics)
+
+    @staticmethod
+    def _load_metrics(metrics_file: Path) -> Dict[str, pd.Series]:
+        metrics_raw = _load_json_from_path(metrics_file)
+        metrics = {}
+        for metric_name, metric_content in metrics_raw.items():
+            metrics[metric_name] = pd.Series(
+                data=metric_content["values"], index=pd.Index(metric_content["steps"], name="step"), name=metric_name
+            )
+        return metrics
+
+    @staticmethod
+    def _load_artifacts(run_dir: Path) -> Dict[str, Artifact]:
+        artifacts = {}
+        reserved = {"run.json", "cout.txt", "metrics.json", "config.json"}
+        artifact_paths = (p for p in run_dir.iterdir() if p.name not in reserved and not p.is_dir())
+        for artifact_path in artifact_paths:
+            artifact_file = artifact_path.open(mode="rb")
+            name = artifact_path.name
+            artifacts[name] = Artifact(name, artifact_file)
+
+        return artifacts
+
+
+def _load_json_from_path(path: Path) -> Any:
+    with path.open() as f:
+        return json.load(f)

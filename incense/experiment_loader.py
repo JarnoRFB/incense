@@ -2,13 +2,14 @@
 import importlib
 import numbers
 from functools import _lru_cache_wrapper, lru_cache
+from pathlib import Path
 from typing import *
 
 import gridfs
 import pymongo
 from pymongo import MongoClient
 
-from .experiment import Experiment
+from .experiment import Experiment, FileSystemExperiment
 from .query_set import QuerySet
 
 MAX_CACHE_SIZE = 32
@@ -189,3 +190,27 @@ class ExperimentLoader:
         elif isinstance(value, numbers.Real):
             cursor = self._runs.find({key: value})
         return cursor
+
+
+class FileSystemExperimentLoader:
+    """Loads artifacts related to experiments."""
+
+    def __init__(self, runs_dir: Union[Path, str]):
+        self._runs_dir = Path(runs_dir)
+
+    # The cache makes sure that retrieval of the experiments
+    # is not unnecessarily done more than once.
+    @lru_cache(maxsize=MAX_CACHE_SIZE)
+    def find_by_id(self, experiment_id: int) -> FileSystemExperiment:
+        """
+        Find experiment based on its id.
+
+        Args:
+            experiment_id: The id  of the experiment.
+
+        Returns:
+            The experiment corresponding to the id.
+        """
+        [run_dir] = (run_dir for run_dir in self._runs_dir.iterdir() if run_dir.name == str(experiment_id))
+
+        return FileSystemExperiment.from_run_dir(run_dir)
