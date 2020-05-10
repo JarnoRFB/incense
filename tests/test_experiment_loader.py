@@ -1,8 +1,12 @@
 # -*- coding: future_fstrings -*-
+from pathlib import Path
+
+import pytest
 from pytest import raises
 from sacred import Experiment as SacredExperiment
 
-from incense.experiment import Experiment
+from incense.experiment import Experiment, FileSystemExperiment
+from incense.experiment_loader import FileSystemExperimentLoader
 
 
 def test_find_by_id(loader):
@@ -104,3 +108,18 @@ def test_find(loader):
 def test_error_message_for_missing_id(loader):
     with raises(ValueError, match='Experiment with id 4 does not exist in database "incense_test".'):
         exp = loader.find_by_id(4)
+
+
+class TestFileSystemExperimentLoader:
+    @pytest.fixture
+    def loader(self):
+        return FileSystemExperimentLoader(Path("~/data/incense_test/").expanduser())
+
+    def test_find_by_id(self, loader):
+        exp = loader.find_by_id(1)
+        assert isinstance(exp, FileSystemExperiment)
+        assert exp.id == 1
+
+    def test_error_message_for_missing_id(self, loader):
+        with raises(ValueError, match="Experiment with id 4 does not exist in filesystems runs directory"):
+            exp = loader.find_by_id(4)

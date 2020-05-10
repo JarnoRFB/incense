@@ -198,6 +198,9 @@ class FileSystemExperimentLoader:
     def __init__(self, runs_dir: Union[Path, str]):
         self._runs_dir = Path(runs_dir)
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}("{self._runs_dir}")'
+
     # The cache makes sure that retrieval of the experiments
     # is not unnecessarily done more than once.
     @lru_cache(maxsize=MAX_CACHE_SIZE)
@@ -211,6 +214,11 @@ class FileSystemExperimentLoader:
         Returns:
             The experiment corresponding to the id.
         """
-        [run_dir] = (run_dir for run_dir in self._runs_dir.iterdir() if run_dir.name == str(experiment_id))
-
-        return FileSystemExperiment.from_run_dir(run_dir)
+        try:
+            [run_dir] = (run_dir for run_dir in self._runs_dir.iterdir() if run_dir.name == str(experiment_id))
+        except ValueError:
+            raise ValueError(
+                f'Experiment with id {experiment_id} does not exist in filesystems runs directory "{self._runs_dir}"'
+            )
+        else:
+            return FileSystemExperiment.from_run_dir(run_dir)

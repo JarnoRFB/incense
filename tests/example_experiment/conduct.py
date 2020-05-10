@@ -1,5 +1,6 @@
 # -*- coding: future_fstrings -*-
 import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,7 +9,7 @@ import seaborn as sns
 import tensorflow as tf
 from matplotlib.animation import FFMpegWriter
 from sacred import Experiment
-from sacred.observers import MongoObserver
+from sacred.observers import FileStorageObserver, MongoObserver
 from sacred.utils import apply_backspaces_and_linefeeds
 from sklearn.metrics import confusion_matrix
 
@@ -75,6 +76,9 @@ ex = Experiment("example")
 ex.captured_out_filter = apply_backspaces_and_linefeeds
 
 ex.observers.append(MongoObserver(url=get_mongo_uri(), db_name="incense_test"))
+basedir = Path("~/data/incense_test").expanduser()
+basedir.mkdir(parents=True, exist_ok=True)
+ex.observers.append(FileStorageObserver(basedir=basedir))
 
 
 @ex.config

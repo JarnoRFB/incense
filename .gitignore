@@ -117,6 +117,9 @@ dmypy.json
 # Pycharm
 .idea/
 
+# vscode
+incense.srctrl*
+
 # Outputs from example experiment
 example_experiment/*
 !example_experiment/conduct.py

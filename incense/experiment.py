@@ -127,7 +127,7 @@ class Experiment:
 
 
 class FileSystemExperiment:
-    def __init__(self, id_, data: Dict[str, Any], artifacts: Dict[str, Artifact], metrics: Dict[str, pd.Series]):
+    def __init__(self, id_: int, data: Dict[str, Any], artifacts: Dict[str, Artifact], metrics: Dict[str, pd.Series]):
         self.id = id_
         self._data = data
         self.artifacts = artifacts
@@ -142,7 +142,7 @@ class FileSystemExperiment:
 
     @classmethod
     def from_run_dir(cls, run_dir: Path):
-        id_ = run_dir.name
+        id_ = int(run_dir.name)
         config = _load_json_from_path(run_dir / "config.json")
         run_data = _load_json_from_path(run_dir / "run.json")
         cout = (run_dir / "cout.txt").read_text()
