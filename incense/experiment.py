@@ -5,9 +5,8 @@ from typing import *
 
 import jsonpickle
 import pandas as pd
-from pyrsistent import freeze, thaw
-
 from incense.artifact import Artifact, content_type_to_artifact_cls
+from pyrsistent import freeze, thaw
 
 
 class Experiment:

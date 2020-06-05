@@ -5,13 +5,14 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+      args:   
+        - USER_UID=${UID:-1000}
     security_opt: ['label:disable']
-    user: ${FIXUID:-1000}:${FIXGID:-1000}
     volumes:
-      - ../:/home/docker/workspace:Z
-      - vscode-remote:/home/docker/.vscode-server:Z
-      - ~/.gitconfig:/home/docker/.gitconfig:ro,z
-      - ~/.ssh:/home/docker/.ssh:z
+      - ../:/home/vscode/workspace:Z
+      - vscode-remote:/home/vscode/.vscode-server:Z
+      - filesytem-oberser-rundir:/home/vscode/incense_test:Z
+      - ~/.ssh:/home/vscode/.ssh:z
     ports:
       - 127.0.0.1:8888:8888
     command: sleep infinity
@@ -21,8 +22,7 @@ services:
     ports:
       - 127.0.0.1:27017:27017
     restart: unless-stopped
-    environment:
-      - MONGO_DATABASE=incense_test
+    env_file: .env
 
   mongo-express:
     image: mongo-express
@@ -44,4 +44,5 @@ services:
 
 volumes:
   vscode-remote:
+  filesytem-oberser-rundir:
 

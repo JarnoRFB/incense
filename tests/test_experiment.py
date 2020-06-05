@@ -1,5 +1,5 @@
 # -*- coding: future_fstrings -*-
-import collections
+import collections.abc
 from datetime import datetime
 from fractions import Fraction
 
@@ -127,7 +127,7 @@ def test_info(info_db_loader, info_db_loader_pickled, info_mongo_observer):
     assert exp_unpickled.info["number"] == exp_pickled.info["number"] == 13
     assert exp_unpickled.info["list"] == exp_pickled.info["list"] == [1, 2]
     assert exp_unpickled.info["object"] == Fraction(3, 4)
-    assert isinstance(exp_pickled.info["object"], collections.Mapping)
+    assert isinstance(exp_pickled.info["object"], collections.abc.Mapping)
 
     exp_unpickled.delete(confirmed=True)
 

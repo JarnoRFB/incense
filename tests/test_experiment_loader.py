@@ -2,11 +2,10 @@
 from pathlib import Path
 
 import pytest
-from pytest import raises
-from sacred import Experiment as SacredExperiment
-
 from incense.experiment import Experiment, FileSystemExperiment
 from incense.experiment_loader import FileSystemExperimentLoader
+from pytest import raises
+from sacred import Experiment as SacredExperiment
 
 
 def test_find_by_id(loader):
@@ -114,6 +113,12 @@ class TestFileSystemExperimentLoader:
     @pytest.fixture
     def loader(self):
         return FileSystemExperimentLoader(Path("~/data/incense_test/").expanduser())
+
+    def test_repr(self, loader):
+        loader_repr = repr(loader)
+        # Test only against part, because absolute path depends on environment.
+        assert 'FileSystemExperimentLoader("' in loader_repr
+        assert '/data/incense_test")' in loader_repr
 
     def test_find_by_id(self, loader):
         exp = loader.find_by_id(1)

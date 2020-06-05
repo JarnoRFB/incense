@@ -60,6 +60,14 @@ We recommend using the `VSCode devcontainer <https://code.visualstudio.com/docs/
 It will automatically install all dependencies and start
 necessary services, such as mongoDB and JupyterLab.
 See `<.devcontainer/docker-compose.yml>`_ for details.
+If the output of ``id -u`` is something different than ``1000`` on your system, please add
+
+::
+
+   export UID
+
+to your ``.bashrc`` or ``.zshrc``.
+
 Building the container for the first time may take some time.
 Once in the container run
 
