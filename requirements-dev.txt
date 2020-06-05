@@ -13,3 +13,4 @@ pylint
 black
 doc8
 rope
+mypy==0.780

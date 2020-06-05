@@ -21,8 +21,7 @@ services:
     ports:
       - 127.0.0.1:27017:27017
     restart: unless-stopped
-    environment:
-      - MONGO_DATABASE=incense_test
+    env_file: .env
 
   mongo-express:
     image: mongo-express

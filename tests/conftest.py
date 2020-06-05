@@ -11,7 +11,12 @@ from incense import ExperimentLoader
 
 
 def get_mongo_uri():
-    in_devcontainer = os.environ.get("TERM_PROGRAM") == "vscode" or os.environ.get("HOME") == "/home/docker"
+    print(os.environ.get("TERM_PROGRAM") )
+    print(os.environ.get("HOME") )
+    print(os.environ )
+    
+    in_devcontainer = os.environ.get("TERM_PROGRAM") == "vscode" or os.environ.get("HOME") == "/home/vscode" or (os.environ.get("PATH") or "").startswith("/home/vscode")
+    print(in_devcontainer)
     if in_devcontainer:
         return "mongodb://mongo:27017"
     else:
