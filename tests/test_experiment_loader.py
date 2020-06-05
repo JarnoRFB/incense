@@ -115,7 +115,10 @@ class TestFileSystemExperimentLoader:
         return FileSystemExperimentLoader(Path("~/data/incense_test/").expanduser())
 
     def test_repr(self, loader):
-        assert repr(loader) == 'FileSystemExperimentLoader("/home/vscode/data/incense_test")'
+        loader_repr = repr(loader)
+        # Test only against part, because absolute path depends on environment.
+        assert 'FileSystemExperimentLoader("' in loader_repr
+        assert '/data/incense_test")' in loader_repr
 
     def test_find_by_id(self, loader):
         exp = loader.find_by_id(1)
