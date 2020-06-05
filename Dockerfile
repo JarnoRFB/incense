@@ -55,9 +55,8 @@ COPY requirements.txt requirements-dev.txt ${HOME}/workspace/
 RUN pip install -r requirements-dev.txt
 
 
-ENV TERM xterm
-# set the zsh theme
-ENV ZSH_THEME=agnoster \
+ENV TERM=xterm \
+    ZSH_THEME=agnoster \
     EDITOR=vi
 RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
 ENV SHELL /usr/bin/zsh

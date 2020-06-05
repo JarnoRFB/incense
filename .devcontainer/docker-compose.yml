@@ -11,6 +11,7 @@ services:
     volumes:
       - ../:/home/vscode/workspace:Z
       - vscode-remote:/home/vscode/.vscode-server:Z
+      - filesytem-oberser-rundir:/home/vscode/incense_test:Z
       - ~/.ssh:/home/vscode/.ssh:z
     ports:
       - 127.0.0.1:8888:8888
@@ -43,4 +44,5 @@ services:
 
 volumes:
   vscode-remote:
+  filesytem-oberser-rundir:
 
