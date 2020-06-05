@@ -2,11 +2,10 @@
 from pathlib import Path
 
 import pytest
-from pytest import raises
-from sacred import Experiment as SacredExperiment
-
 from incense.experiment import Experiment, FileSystemExperiment
 from incense.experiment_loader import FileSystemExperimentLoader
+from pytest import raises
+from sacred import Experiment as SacredExperiment
 
 
 def test_find_by_id(loader):
@@ -114,6 +113,9 @@ class TestFileSystemExperimentLoader:
     @pytest.fixture
     def loader(self):
         return FileSystemExperimentLoader(Path("~/data/incense_test/").expanduser())
+
+    def test_repr(self, loader):
+        assert repr(loader) == 'FileSystemExperimentLoader("/home/vscode/data/incense_test")'
 
     def test_find_by_id(self, loader):
         exp = loader.find_by_id(1)

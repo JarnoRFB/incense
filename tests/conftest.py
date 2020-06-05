@@ -4,19 +4,17 @@ import jsonpickle.handlers
 import numpy as np
 import pandas as pd
 import pytest
+from incense import ExperimentLoader
 from sacred import Experiment as SacredExperiment
 from sacred.observers import MongoObserver
 
-from incense import ExperimentLoader
-
 
 def get_mongo_uri():
-    print(os.environ.get("TERM_PROGRAM") )
-    print(os.environ.get("HOME") )
-    print(os.environ )
-    
-    in_devcontainer = os.environ.get("TERM_PROGRAM") == "vscode" or os.environ.get("HOME") == "/home/vscode" or (os.environ.get("PATH") or "").startswith("/home/vscode")
-    print(in_devcontainer)
+    in_devcontainer = (
+        os.environ.get("TERM_PROGRAM") == "vscode"
+        or os.environ.get("HOME") == "/home/vscode"
+        or (os.environ.get("PATH") or "").startswith("/home/vscode")
+    )
     if in_devcontainer:
         return "mongodb://mongo:27017"
     else:
@@ -102,12 +100,12 @@ def add_exp_to_db():
         ex.observers.append(delete_mongo_observer)
         ex.add_config({"value": config_value})
 
-        def run(value, _run):
+        def run_fn(value, _run):
             _run.log_scalar("test_metric", 1)
             _run.add_artifact(__file__)
             return value
 
-        ex.main(run)
+        ex.main(run_fn)
         run = ex.run()
         return run._id
 

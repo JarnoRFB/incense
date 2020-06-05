@@ -46,7 +46,7 @@ RUN mkdir -p ${HOME}/.ssh \
 WORKDIR ${HOME}/workspace
 
 # Install Python dependencies from requirements.txt if it exists
-RUN conda create -n env python=3.7
+RUN conda create -n env python=3.6
 RUN echo "source activate env" > ~/.bashrc
 ENV PATH /opt/conda/envs/env/bin:$PATH
 RUN conda install virtualenv
@@ -61,5 +61,3 @@ ENV ZSH_THEME=agnoster \
     EDITOR=vi
 RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
 ENV SHELL /usr/bin/zsh
-
-# ENTRYPOINT ["zsh"]
