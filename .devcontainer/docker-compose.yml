@@ -8,12 +8,10 @@ services:
       args:   
         - USER_UID=${UID:-1000}
     security_opt: ['label:disable']
-    # user: ${FIXUID:-1000}:${FIXGID:-1000}
     volumes:
-      - ../:/home/docker/workspace:Z
-      - vscode-remote:/home/docker/.vscode-server:Z
-      - ~/.gitconfig:/home/docker/.gitconfig:ro,z
-      - ~/.ssh:/home/docker/.ssh:z
+      - ../:/home/vscode/workspace:Z
+      - vscode-remote:/home/vscode/.vscode-server:Z
+      - ~/.ssh:/home/vscode/.ssh:z
     ports:
       - 127.0.0.1:8888:8888
     command: sleep infinity

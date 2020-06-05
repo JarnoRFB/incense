@@ -2,7 +2,7 @@
 	"dockerComposeFile": "docker-compose.yml",
 	"remoteUser": "vscode",
 	"service": "workspace",
-	"workspaceFolder": "/home/docker/workspace",
+	"workspaceFolder": "/home/vscode/workspace",
 	"extensions": [
 		"ms-python.python",
 		"redhat.vscode-yaml",
