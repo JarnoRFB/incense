@@ -1,5 +1,6 @@
 {
 	"dockerComposeFile": "docker-compose.yml",
+	"remoteUser": "vscode",
 	"service": "workspace",
 	"workspaceFolder": "/home/docker/workspace",
 	"extensions": [

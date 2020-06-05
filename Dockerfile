@@ -1,20 +1,30 @@
-#-----------------------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See LICENSE in the project root for license information.
-#-----------------------------------------------------------------------------------------
-
 FROM continuumio/miniconda3
+
+ARG USERNAME=vscode
+# Adapt to your output of id -u
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
 
 # Configure apt
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get -y install --no-install-recommends apt-utils 2>&1
 
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    #
+    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
 # Install git, process tools, lsb-release (common in install instructions for CLIs)
-RUN apt-get -y install git procps lsb-release ffmpeg vim exuberant-ctags
+RUN apt -y install git procps lsb-release ffmpeg vim exuberant-ctags zsh wget
 
 # Install any missing dependencies for enhanced language service
-RUN apt-get install -y libicu[0-9][0-9]
+RUN apt install -y libicu[0-9][0-9]
 
 # Clean up
 RUN apt-get autoremove -y \
@@ -22,41 +32,34 @@ RUN apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 ENV DEBIAN_FRONTEND=dialog
 
-RUN addgroup --gid 1000 docker && \
-    adduser --uid 1000 --ingroup docker --home /home/docker --shell /bin/sh --disabled-password --gecos "" docker
-RUN chown -R docker:docker /opt/conda/
+RUN chown -R ${USER_UID}:${USER_GID} /opt/conda/
+
+USER $USERNAME
+
+ENV HOME /home/${USERNAME}
 
 
-# install fixuid
-RUN USER=docker && \
-    GROUP=docker && \
-    curl -SsL https://github.com/boxboat/fixuid/releases/download/v0.1/fixuid-0.1-linux-amd64.tar.gz | tar -C /usr/local/bin -xzf - && \
-    chown root:root /usr/local/bin/fixuid && \
-    chmod 4755 /usr/local/bin/fixuid && \
-    mkdir -p /etc/fixuid && \
-    printf "user: $USER\ngroup: $GROUP\n" > /etc/fixuid/config.yml
+RUN mkdir -p ${HOME}/.ssh \
+    && mkdir -p ${HOME}/.vscode-server \
+    && mkdir -p ${HOME}/workspace
 
-
-USER docker:docker
-ENV HOME /home/docker
-# Set the default shell to bash rather than sh
-ENV SHELL /bin/bash
-
-RUN mkdir -p /home/docker/.ssh \
-    && mkdir -p /home/docker/.vscode-server \
-    && mkdir -p /home/docker/workspace
-
-WORKDIR /home/docker/workspace
+WORKDIR ${HOME}/workspace
 
 # Install Python dependencies from requirements.txt if it exists
-RUN conda create -n env python=3.6
+RUN conda create -n env python=3.7
 RUN echo "source activate env" > ~/.bashrc
 ENV PATH /opt/conda/envs/env/bin:$PATH
 RUN conda install virtualenv
 RUN pip install tox-conda
-COPY requirements.txt requirements-dev.txt /home/docker/workspace/
+COPY requirements.txt requirements-dev.txt ${HOME}/workspace/
 RUN pip install -r requirements-dev.txt
 
-ENTRYPOINT ["fixuid"]
 
+ENV TERM xterm
+# set the zsh theme
+ENV ZSH_THEME=agnoster \
+    EDITOR=vi
+RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
+ENV SHELL /usr/bin/zsh
 
+# ENTRYPOINT ["zsh"]

@@ -5,8 +5,10 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+      args:   
+        - USER_UID=${UID:-1000}
     security_opt: ['label:disable']
-    user: ${FIXUID:-1000}:${FIXGID:-1000}
+    # user: ${FIXUID:-1000}:${FIXGID:-1000}
     volumes:
       - ../:/home/docker/workspace:Z
       - vscode-remote:/home/docker/.vscode-server:Z
