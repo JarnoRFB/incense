@@ -35,9 +35,17 @@ text that contains the interpretation.
 Installation
 ------------
 
+Install the latest release
+
 ::
 
    pip install incense
+   
+Or install the latest development version
+
+::
+
+   pip install git+https://github.com/JarnoRFB/incense.git
 
 Documentation
 -------------
