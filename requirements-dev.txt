@@ -2,7 +2,7 @@
 pytest
 pytest-cov
 codecov
-tensorflow==2.5.3
+tensorflow==2.6.4
 python-dotenv
 scikit-learn
 jupyterlab
