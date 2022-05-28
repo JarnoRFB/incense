@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 from collections import OrderedDict, UserList, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from copy import copy
@@ -31,8 +30,8 @@ class QuerySet(UserList):
             values in the experiment model can be used inplace of a path. This is useful for summarizing metrics.
         rename: The renaming strategy used to create the column names. Either "last" to take the last element in each
                 path as a column name or None to use the complete paths as column names.
-        on_missing: {"raise", "ignore"} Whether to raise an error when missing value is encountered or replace it with 
-                    a missing value. 
+        on_missing: {"raise", "ignore"} Whether to raise an error when missing value is encountered or replace it with
+                    a missing value.
 
         Returns
         -------

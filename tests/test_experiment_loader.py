@@ -1,11 +1,11 @@
-# -*- coding: future_fstrings -*-
 from pathlib import Path
 
 import pytest
-from incense.experiment import Experiment, FileSystemExperiment
-from incense.experiment_loader import FileSystemExperimentLoader
 from pytest import raises
 from sacred import Experiment as SacredExperiment
+
+from incense.experiment import Experiment, FileSystemExperiment
+from incense.experiment_loader import FileSystemExperimentLoader
 
 
 def test_find_by_id(loader):

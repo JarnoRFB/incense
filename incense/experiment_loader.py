@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 import importlib
 import numbers
 from functools import _lru_cache_wrapper, lru_cache

@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 from functools import reduce
 from operator import and_, or_
 from typing import *

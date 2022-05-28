@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - anaconda
 dependencies:
-  - python=3.6
+  - python=3.7
   - numpy
   - matplotlib
   - pandas
@@ -12,5 +12,5 @@ dependencies:
   - mongodb
   - seaborn
   - pip:
-    - git+https://github.com/IDSIA/sacred.git
-    - incense
+      - git+https://github.com/IDSIA/sacred.git
+      - incense

@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 import collections.abc
 from datetime import datetime
 from fractions import Fraction

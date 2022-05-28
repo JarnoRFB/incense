@@ -3,5 +3,4 @@ pandas>=0.23
 pymongo>=3.7
 easydict>=1.9
 ipython>=7.2
-future-fstrings==1.0.0
 attrs==19.3.0

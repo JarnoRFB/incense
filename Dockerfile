@@ -23,8 +23,8 @@ RUN groupadd --gid $USER_GID $USERNAME \
 # Install git, process tools, lsb-release (common in install instructions for CLIs)
 RUN apt -y install git procps lsb-release ffmpeg vim exuberant-ctags zsh wget
 
-# Install any missing dependencies for enhanced language service
-RUN apt install -y libicu[0-9][0-9]
+# # Install any missing dependencies for enhanced language service
+# RUN apt install -y libicu[0-9][0-9]
 
 # Clean up
 RUN apt-get autoremove -y \
@@ -46,7 +46,7 @@ RUN mkdir -p ${HOME}/.ssh \
 WORKDIR ${HOME}/workspace
 
 # Install Python dependencies from requirements.txt if it exists
-RUN conda create -n env python=3.6
+RUN conda create -n env python=3.7
 RUN echo "source activate env" > ~/.bashrc
 ENV PATH /opt/conda/envs/env/bin:$PATH
 RUN conda install virtualenv

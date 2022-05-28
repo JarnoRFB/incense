@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 import os
 import pickle
 import warnings
