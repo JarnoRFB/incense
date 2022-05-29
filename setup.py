@@ -29,8 +29,6 @@ setup(
         "jupyterlab>=1.0",
         "pymongo>=3.7",
         "pyrsistent>=0.15.2",
-        "future-fstrings==1.0.0",
-        "tokenize-rt==2.2.0",
     ],
     include_package_data=True,
     classifiers=[

@@ -6,7 +6,7 @@ from typing import *
 
 import gridfs
 import pymongo
-from pymongo import MongoClient
+from pymongo.mongo_client import MongoClient
 
 from .experiment import Experiment, FileSystemExperiment
 from .query_set import QuerySet
@@ -18,7 +18,7 @@ class ExperimentLoader:
     """Loads artifacts related to experiments."""
 
     def __init__(self, mongo_uri=None, db_name="sacred", unpickle: bool = True):
-        client = MongoClient(mongo_uri)
+        client: MongoClient = MongoClient(mongo_uri)
         self._database = client[db_name]
         self._runs = self._database.runs
         self._grid_filesystem = gridfs.GridFS(self._database)
