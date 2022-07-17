@@ -1,11 +1,11 @@
 import importlib
 import numbers
-from functools import _lru_cache_wrapper, lru_cache
+from functools import lru_cache
 from pathlib import Path
 from typing import *
 
 import gridfs
-import pymongo
+from pymongo import DESCENDING
 from pymongo.mongo_client import MongoClient
 
 from .experiment import Experiment, FileSystemExperiment
@@ -139,7 +139,7 @@ class ExperimentLoader:
         Returns:
             Either the latest experiment or the set of latest experiments in case more than one were requested.
         """
-        cursor = self._runs.find().sort(attr, pymongo.DESCENDING).limit(n)
+        cursor = self._runs.find().sort(attr, DESCENDING).limit(n)
         experiments = [self._make_experiment(experiment) for experiment in cursor]
         if len(experiments) == 1:
             return experiments[0]
@@ -188,6 +188,8 @@ class ExperimentLoader:
             cursor = self._runs.find({key: {"$regex": rf"{value}"}})
         elif isinstance(value, numbers.Real):
             cursor = self._runs.find({key: value})
+        else:
+            raise ValueError(f"Search value should be either string or number, but was {value}")
         return cursor
 
 
