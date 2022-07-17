@@ -83,7 +83,7 @@ Alternatively, you can use conda to set up your local development environment.
 
 ::
 
-  $ conda create -n incense-dev python=3.6
+  $ conda create -n incense-dev python=3.7
   $ conda activate incense-dev
   # virtualenv is required for the precommit environments.
   $ conda install virtualenv

@@ -277,17 +277,13 @@ https://creativecommons.org/publicdomain/zero/1.0/ .
 
 from __future__ import print_function
 
+import configparser
 import errno
 import json
 import os
 import re
 import subprocess
 import sys
-
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
 
 
 class VersioneerConfig:

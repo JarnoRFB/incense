@@ -1,12 +1,12 @@
-# -*- coding: future_fstrings -*-
 import json
 from pathlib import Path
 from typing import *
 
 import jsonpickle
 import pandas as pd
-from incense.artifact import Artifact, content_type_to_artifact_cls
 from pyrsistent import freeze, thaw
+
+from incense.artifact import Artifact, content_type_to_artifact_cls
 
 
 class Experiment:

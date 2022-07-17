@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 import imghdr
 import os
 import pickle
@@ -6,9 +5,10 @@ import pickle
 import IPython
 import pandas as pd
 import pytest
-from incense import artifact
 from IPython.display import HTML
 from pytest import raises
+
+from incense import artifact
 
 
 def test_repr(loader):

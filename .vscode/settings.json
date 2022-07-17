@@ -4,5 +4,6 @@
     "python.testing.unittestEnabled": false,
     "python.testing.nosetestsEnabled": false,
     "python.testing.pytestEnabled": true,
-    "restructuredtext.confPath": "${workspaceFolder}/.tox/py36/lib/python3.6/site-packages/importlib_resources/docs"
+    "restructuredtext.confPath": "${workspaceFolder}/.tox/py36/lib/python3.7/site-packages/importlib_resources/docs",
+    "esbonio.sphinx.confDir": "${workspaceFolder}/.tox/py36/lib/python3.7/site-packages/importlib_resources/docs"
 }
