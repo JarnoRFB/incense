@@ -1,0 +1,6 @@
+paths-ignore:
+  - versioneer.py
+  - incense/_version.py
+query-filters:
+  - exclude:
+      id: py/syntax-error
