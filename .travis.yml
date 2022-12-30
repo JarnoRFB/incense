@@ -14,7 +14,7 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then sudo apt-get install -y ffmpeg; fi
   - ffmpeg -hwaccels
 install:
-  - pip install tox-travis codecov
+  - pip install tox-travis tox==3.28.0 codecov
   - pip install -r requirements-dev.txt
 script:
   - python tests/example_experiment/conduct.py
