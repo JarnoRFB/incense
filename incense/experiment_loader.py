@@ -17,8 +17,8 @@ MAX_CACHE_SIZE = 32
 class ExperimentLoader:
     """Loads artifacts related to experiments."""
 
-    def __init__(self, mongo_uri=None, db_name="sacred", unpickle: bool = True):
-        client: MongoClient = MongoClient(mongo_uri)
+    def __init__(self, mongo_uri=None, db_name="sacred", unpickle: bool = True, **mongo_client_kwargs):
+        client: MongoClient = MongoClient(mongo_uri, **mongo_client_kwargs)
         self._database = client[db_name]
         self._runs = self._database.runs
         self._grid_filesystem = gridfs.GridFS(self._database)
