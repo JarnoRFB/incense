@@ -5,10 +5,11 @@ codecov==2.1.12
 tensorflow==2.9.3
 python-dotenv==0.20.0
 scikit-learn==1.0.2
-jupyterlab==3.4.2
+jupyterlab==3.6.7
 seaborn==0.11.2
 pre-commit==2.19.0
 black==22.3.0
 doc8==0.11.2
 rope==1.1.1
 mypy==0.960
+pillow>=10.2.0 # not directly required, pinned by Snyk to avoid a vulnerability
