@@ -172,9 +172,8 @@ class FileSystemExperiment:
         reserved = {"run.json", "cout.txt", "metrics.json", "config.json", "info.json"}
         artifact_paths = (p for p in run_dir.iterdir() if p.name not in reserved and not p.is_dir())
         for artifact_path in artifact_paths:
-            artifact_file = artifact_path.open(mode="rb")
             name = artifact_path.name
-            artifacts[name] = Artifact(name, artifact_file)
+            artifacts[name] = Artifact(name, artifact_path)
 
         return artifacts
 
