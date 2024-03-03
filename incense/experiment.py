@@ -143,7 +143,10 @@ class FileSystemExperiment:
     def from_run_dir(cls, run_dir: Path):
         id_ = int(run_dir.name)
         config = _load_json_from_path(run_dir / "config.json")
-        info = _load_json_from_path(run_dir / "info.json")
+        if "info.json" in [f.name for f in run_dir.iterdir()]:
+            info = _load_json_from_path(run_dir / "info.json")
+        else:
+            info = {}
         run_data = _load_json_from_path(run_dir / "run.json")
         cout = (run_dir / "cout.txt").read_text()
         run_data["config"] = config
@@ -166,7 +169,7 @@ class FileSystemExperiment:
     @staticmethod
     def _load_artifacts(run_dir: Path) -> Dict[str, Artifact]:
         artifacts = {}
-        reserved = {"run.json", "cout.txt", "metrics.json", "config.json"}
+        reserved = {"run.json", "cout.txt", "metrics.json", "config.json", "info.json"}
         artifact_paths = (p for p in run_dir.iterdir() if p.name not in reserved and not p.is_dir())
         for artifact_path in artifact_paths:
             artifact_file = artifact_path.open(mode="rb")
