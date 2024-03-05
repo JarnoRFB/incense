@@ -143,7 +143,7 @@ class FileSystemExperiment:
     def from_run_dir(cls, run_dir: Path):
         id_ = int(run_dir.name)
         config = _load_json_from_path(run_dir / "config.json")
-        if "info.json" in [f.name for f in run_dir.iterdir()]:
+        if (run_dir / "info.json").exists():
             info = _load_json_from_path(run_dir / "info.json")
         else:
             info = {}
