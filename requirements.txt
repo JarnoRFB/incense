@@ -4,3 +4,4 @@ pymongo==4.1.1
 ipython==8.10.0
 pyrsistent==0.18.1
 attrs==19.3.0
+gitpython>=3.1.41 # not directly required, pinned by Snyk to avoid a vulnerability
